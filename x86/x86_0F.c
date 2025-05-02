@@ -1,5 +1,83 @@
 #include "data.h"
 
+// CMOVZ r(16-64), r/m(16-64)
+void ASM_0F_44(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
+    ASM_incIP(2, &rm);
+    
+    if (rm.isPtr) {
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
+        if (rm.disp == 1) data->disp = (s8)data->disp;
+
+        if (f.f.zf) {
+            switch (rm.otype) {
+                case R_Bit16: { STACK16(temp, reg + data->disp); regs[rm.oreg].x = *temp; break; }
+                case R_Bit32: { STACK32(temp, reg + data->disp); regs[rm.oreg].e = *temp; regs[rm.oreg].eh = 0; break; }
+                case R_Bit64: { STACK64(temp, reg + data->disp); regs[rm.oreg].r = *temp; break; }
+                default: break;
+            }
+        } else if (rm.otype == R_Bit32) {
+            regs[rm.oreg].eh = 0;
+        }
+
+        ASM_rmPrint("CMOVZ", &rm, data->disp, v_Reg, true);
+    } else {
+        if (!f.f.zf) {
+            switch (rm.otype) {
+                case R_Bit16: regs[rm.oreg].x = regs[rm.areg].x; break;
+                case R_Bit32: regs[rm.oreg].e = regs[rm.areg].e; regs[rm.oreg].eh = 0; break;
+                case R_Bit64: regs[rm.oreg].r = regs[rm.areg].r; break;
+                default: break;
+            }
+        } else if (rm.otype == R_Bit32) {
+            regs[rm.oreg].eh = 0;
+        }
+        printf("CMOVZ %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
+// CMOVNZ r(16-64), r/m(16-64)
+void ASM_0F_45(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
+    ASM_incIP(2, &rm);
+    
+    if (rm.isPtr) {
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
+        if (rm.disp == 1) data->disp = (s8)data->disp;
+
+        if (!f.f.zf) {
+            switch (rm.otype) {
+                case R_Bit16: { STACK16(temp, reg + data->disp); regs[rm.oreg].x = *temp; break; }
+                case R_Bit32: { STACK32(temp, reg + data->disp); regs[rm.oreg].e = *temp; regs[rm.oreg].eh = 0; break; }
+                case R_Bit64: { STACK64(temp, reg + data->disp); regs[rm.oreg].r = *temp; break; }
+                default: break;
+            }
+        } else if (rm.otype == R_Bit32) {
+            regs[rm.oreg].eh = 0;
+        }
+
+        ASM_rmPrint("CMOVNZ", &rm, data->disp, v_Reg, true);
+    } else {
+        if (!f.f.zf) {
+            switch (rm.otype) {
+                case R_Bit16: regs[rm.oreg].x = regs[rm.areg].x; break;
+                case R_Bit32: regs[rm.oreg].e = regs[rm.areg].e; regs[rm.oreg].eh = 0; break;
+                case R_Bit64: regs[rm.oreg].r = regs[rm.areg].r; break;
+                default: break;
+            }
+        } else if (rm.otype == R_Bit32) {
+            regs[rm.oreg].eh = 0;
+        }
+        printf("CMOVNZ %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 bool ASM_0F_85(Data *data) {
     Reg conv = { .e = data->val };
     ASM_incIP(IS_OP(6, 4), NULL);
@@ -128,7 +206,7 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 1X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 2X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 3X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* 4X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* 4X */ 0, 0, 0, 0, 0, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 5X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 6X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 7X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -142,6 +220,4 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* FX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 };
 
-#define ASM_0F_I(ix, data, t)               \
-    if (ASM_0F_## ix (data)) goto JMP_##t;  \
-    ASM_end()
+#define ASM_0F_I(ix, data, t) if (ASM_0F_## ix (data)) goto JMP_##t; ASM_end()

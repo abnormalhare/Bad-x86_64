@@ -147,6 +147,8 @@ void ASM_83SUB(RM *rm, s32 disp, u8 val) {
 void ASM_83CMP(RM *rm, s32 disp, u8 val) {
     Reg prev;
     Reg res;
+
+    s8 sval = val;
     
     if (rm->isPtr) {
         u64 reg = ASM_getReg(rm->areg, rm->atype);
@@ -174,9 +176,9 @@ void ASM_83CMP(RM *rm, s32 disp, u8 val) {
     }
 
     switch (rm->otype) {
-        case R_Bit16: res.x = prev.x - val;
-        case R_Bit32: res.e = prev.e - val;
-        case R_Bit64: res.r = prev.r - val;
+        case R_Bit16: { s16 _res = (s16)prev.x - sval; res.x = _res; break; }
+        case R_Bit32: { s32 _res = (s32)prev.e - sval; res.e = _res; break; }
+        case R_Bit64: { s64 _res = (s64)prev.r - sval; res.r = _res; break; }
         default: break;
     }
 
