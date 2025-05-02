@@ -19,7 +19,7 @@ void asm_func(void) {
 void setupStack() {
   { STACK8(temp, 0); *temp = 'M'; } // this is how to store data into the stack
   { STACK16(temp, 8); *temp = 0x3F40; }
-  { STACK64(temp, 0x24); *temp = 0x4640493800000023; }
+  { STACK32(temp, 0x24); *temp = 0x46404938; }
   { STACK64(temp, 0x1000); *temp = (u64)&asm_func; } // s and u types are predefined! (s8, s16..., u8, u16...)
 }
 
@@ -36,3 +36,7 @@ int main() {
   ASM_regPrint();
 }
 ```
+
+The bfsvc.c file is an example you can look at for additional help
+
+Checkout checklist.txt to see the currently implemented opcodes!
