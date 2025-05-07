@@ -38,6 +38,7 @@ bool _ASM_7C(s8 val);
 void ASM_81(u8 rm, u8 sib, s32 disp, u32 val);
 void ASM_83(u8 rm, u8 sib, s32 disp, u8 val);
 void ASM_85(u8 rm_code, u8 sib, s32 disp);
+void ASM_88(u8 rm_code, u8 sib, s32 disp);
 void ASM_89(u8 rm_code, u8 sib, s32 disp);
 void ASM_8B(u8 rm_code, u8 sib, s32 disp);
 void ASM_8D(u8 rm_code, u8 sib, s32 disp);

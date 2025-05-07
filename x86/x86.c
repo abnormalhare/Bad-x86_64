@@ -607,6 +607,30 @@ void ASM_85(u8 rm_code, u8 sib, s32 disp) {
     ASM_end();
 }
 
+// MOV r/m(8), r(8)
+void ASM_88(u8 rm_code, u8 sib, s32 disp) {
+    RM rm = ASM_getRM(rm_code, sib, R_Bit8);
+    ASM_incIP(2, &rm);
+
+    if (rm.isPtr) {
+        STACK8(temp, regs[rm.areg].e + disp);
+        *temp = (rm.otype == R_Bit8H) ? regs[rm.oreg].h : regs[rm.oreg].l;
+
+        ASM_rmPrint("MOV", &rm, disp, v_Reg, false);
+    } else {
+        if (rm.atype == R_Bit8H) {
+            regs[rm.areg].h = (rm.otype == R_Bit8H) ? regs[rm.oreg].h : regs[rm.oreg].l;
+        } else {
+            regs[rm.areg].l = (rm.otype == R_Bit8H) ? regs[rm.oreg].h : regs[rm.oreg].l;
+        }
+        
+        printf("MOV %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // MOV r/m(16-64), r(16-64)
 void ASM_89(u8 rm_code, u8 sib, s32 disp) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
@@ -798,10 +822,10 @@ void ASM_E8(u32 val) {
 
     if (!oper) {
         regs[16].e = (s32)regs[16].e + (s32)conv.e;
-        printf("CALL 0x%.4X", conv.e);
+        printf("CALL rip + 0x%.4X", conv.e);
     } else {
         regs[16].x = (s32)regs[16].x + (s16)conv.x;
-        printf("CALL 0x%.2X", conv.x);
+        printf("CALL rip + 0x%.2X", conv.x);
     }
     ASM_rexPrint();
 

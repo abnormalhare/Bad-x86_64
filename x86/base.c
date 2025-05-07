@@ -78,19 +78,16 @@ RM ASM_getRM(u8 rm, u8 sib, RegType type) {
     switch (type) {
         default:
             ret.otype = type;
-            ret.atype = type;
             break;
 
         case R_Bit8:
             if (ret.reg >= 4 && ret.reg <= 8) {
                 ret.otype = IS_REX(R_Bit8H, R_Bit8);
             }
-            ret.atype = type;
             break;
         
         case R_Bit16: case R_Bit32: case R_Bit64:
             ret.otype = IS_OP(IS_W(R_Bit32, R_Bit64), R_Bit16);
-            ret.atype = IS_AD(R_Bit64, R_Bit32);
             break;
 
         case R_MMX: case R_Float128:
@@ -99,6 +96,7 @@ RM ASM_getRM(u8 rm, u8 sib, RegType type) {
     }
 
     ret.areg = IS_B(ret.rm, ret.rm + 8);
+    ret.atype = IS_AD(R_Bit64, R_Bit32);
     if (ret.rm == 4 && ret.mod != 3) {
         ASM_getSIB(&ret, sib);
     } else if (ret.rm == 5 && ret.mod == 0) {
@@ -110,7 +108,14 @@ RM ASM_getRM(u8 rm, u8 sib, RegType type) {
         case 0: if (ret.rm == 5) ret.disp = 4; break;
         case 1: ret.disp = 1; break;
         case 2: ret.disp = 4; break;
-        case 3: ret.atype = ret.otype; ret.isPtr = false; break;
+        case 3:
+            ret.atype = ret.otype;
+            ret.isPtr = false;
+            if (ret.areg >= 4 && ret.areg < 8 && ret.otype == R_Bit8) {
+                ret.areg -= 4;
+                ret.atype = R_Bit8H;
+            }
+            break;
     }
 
     ret.ptrtype = ret.otype;
