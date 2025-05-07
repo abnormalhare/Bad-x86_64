@@ -1,4 +1,9 @@
 *.exe
 .vs
 .vscode
+
 bfsvc/
+boot/
+
+build/
+build.bat

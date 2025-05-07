@@ -1,5 +1,23 @@
 #include "data.h"
 
+// order: a, c, d, b, sp, bp, si, di, 8-15, ip
+Reg regs[17];
+// order: ss, cs, ds, es, fs, gs
+u16 sregs[6];
+FloatReg fregs[16];
+MMXReg xregs[16];
+u64 stregs[8];
+Flags f = {0, .f.on = 1 };
+bool oper = false; // operand override prefix
+bool addr = false; // address override prefix
+bool dup  = false; // float   override prefix
+bool fs   = false; // fs      override prefix
+bool gs   = false; // gs      override prefix
+bool lock = false; // lock prefix
+REXPrefix rex;
+
+u8 *stack;
+
 void ASM_init() {
     stack = (u8*)malloc(0x100000000 * sizeof(u8));
 
@@ -96,6 +114,7 @@ RM ASM_getRM(u8 rm, u8 sib, RegType type) {
     }
 
     ret.ptrtype = ret.otype;
+    ret.valType = REG_NULL;
 
     return ret;
 }
@@ -121,6 +140,10 @@ ASM_codeFunc ASM_getFunc(u64 ip) {
     return func;
 }
 
+ASM_codeFunc ASM_getCurrFunc(void) {
+    return ASM_getFunc(regs[16].e);
+}
+
 u64 ASM_getReg(u8 index, RegType type) {
     u64 reg = 0;
 
@@ -137,7 +160,7 @@ u64 ASM_getReg(u8 index, RegType type) {
     return reg;
 }
 
-void ASM_incIP(u16 num, RM *rm) {
+void ASM_incIP(u32 num, RM *rm) {
     if (rm == NULL) {
         regs[16].e += num;
         return;
@@ -193,7 +216,7 @@ char *ASM_getRegName(u8 index, RegType type) {
     if (buf == NULL) {
         printf("ERROR: getRegName buffer is NULL");
         exit(EXIT_FAILURE);
-        return;
+        return NULL;
     }
 
     memset(buf, 0, 6);
@@ -329,13 +352,13 @@ char ASM_S(void) {
     }
 }
 
-void ASM_rmPrint(const char *name, RM *rm, u32 disp, opVal val, bool flip) {
+void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip) {
     char buf[256] = {0};
-    u8 sDisp = disp;
-    if (disp >= 0x80000000 && rm->disp == 4) {
+    s8 sDisp = disp;
+    if (disp < 0 && rm->disp == 4) {
         disp = -disp;
         ASM_sign = true;
-    } else if (sDisp >= 0x80 && rm->disp == 1) {
+    } else if (sDisp < 0 && rm->disp == 1) {
         sDisp = -sDisp;
         ASM_sign = true;
     }
@@ -377,6 +400,12 @@ void ASM_rmPrint(const char *name, RM *rm, u32 disp, opVal val, bool flip) {
         sprintf_s(buf, 256, "%s%s [%s", buf, ASM_ptrName(rm->ptrtype), ASM_getRegName(rm->breg, rm->btype));
         if      (rm->disp == 1) sprintf_s(buf, 256, "%s %c %#.2X", buf, ASM_S(), sDisp);
         else if (rm->disp == 4) sprintf_s(buf, 256, "%s %c %#.8X", buf, ASM_S(), disp);
+    } else if (rm->areg == 16) {
+        sprintf_s(buf, 256, "%s%s [", buf, ASM_ptrName(rm->ptrtype), ASM_getRegName(rm->areg, rm->atype));
+
+        if (ASM_sign) sDisp = -sDisp; disp = -disp;
+        if      (rm->disp == 1) sprintf_s(buf, 256, "%s%#.8X", buf, sDisp + regs[16].e);
+        else if (rm->disp == 4) sprintf_s(buf, 256, "%s%#.8X", buf, disp + regs[16].e);
     } else {
         sprintf_s(buf, 256, "%s%s [%s", buf, ASM_ptrName(rm->ptrtype), ASM_getRegName(rm->areg, rm->atype));
         if      (rm->disp == 1) sprintf_s(buf, 256, "%s %c %#.2X", buf, ASM_S(), sDisp);
@@ -406,7 +435,7 @@ void ASM_regPrint(void) {
             sprintf(buf, "%s%s:  %.16llX  ", buf, ASM_getRegName(i, R_Bit64), regs[i].r);
         else
             sprintf(buf, "%s%s: %.16llX  ", buf, ASM_getRegName(i, R_Bit64), regs[i].r);
-        if (i == 7) {
+        if (i % 4 == 3) {
             sprintf(buf, "%s\n", buf);
         }
     }

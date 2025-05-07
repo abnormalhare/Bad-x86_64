@@ -3,6 +3,7 @@ The worst way to make an x86_64 emulator. This is a library. The file to include
 
 ## How to use
 ```c
+#include "x86/x86.h"
 
 // These are codefuncs. Store these in the stack to call them.
 void asm_func(void) {

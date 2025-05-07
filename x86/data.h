@@ -161,22 +161,22 @@ typedef void (*ASM_val32Func)(RM *, s32, u32);
 typedef void (*ASM_dataFunc)(Data *);
 
 // order: a, c, d, b, sp, bp, si, di, 8-15, ip
-Reg regs[17];
+extern Reg regs[17];
 // order: ss, cs, ds, es, fs, gs
-u16 sregs[6];
-FloatReg fregs[16];
-MMXReg xregs[16];
-u64 stregs[8];
-Flags f = {0, .f.on = 1 };
-bool oper = false; // operand override prefix
-bool addr = false; // address override prefix
-bool dup  = false; // float   override prefix
-bool fs   = false; // fs      override prefix
-bool gs   = false; // gs      override prefix
-bool lock = false; // lock prefix
-REXPrefix rex;
+extern u16 sregs[6];
+extern FloatReg fregs[16];
+extern MMXReg xregs[16];
+extern u64 stregs[8];
+extern Flags f;
+extern bool oper; // operand override prefix
+extern bool addr; // address override prefix
+extern bool dup; // float   override prefix
+extern bool fs; // fs      override prefix
+extern bool gs; // gs      override prefix
+extern bool lock; // lock prefix
+extern REXPrefix rex;
 
-u8 *stack;
+extern u8 *stack;
 
 #define REG_NULL 255
 
@@ -212,14 +212,16 @@ u8 *stack;
 void ASM_init();
 RM ASM_getRM(u8 rm, u8 sib, RegType type);
 ASM_codeFunc ASM_getFunc(u64 ip);
+ASM_codeFunc ASM_getCurrFunc(void);
 u64 ASM_getReg(u8 index, RegType type);
-void ASM_incIP(uint16_t num, RM *rm);
+void ASM_incIP(u32 num, RM *rm);
 void ASM_setFlags(Reg *prev, Reg *res, RegType type, bool borrow);
 char *ASM_getRegName(u8 index, RegType type);
 const char* ASM_ptrName(RegType bits);
-void ASM_rmPrint(const char *name, RM *rm, u32 disp, opVal val, bool flip);
+void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip);
 void ASM_rexPrint(void);
 void ASM_regPrint(void);
 void ASM_end(void);
+void ASM_exit(void);
 
 #endif /* EBA6F15E_AF03_4213_BEF3_CE3839FA5FFA */
