@@ -1,12 +1,12 @@
 #include "data.h"
 
 // order: a, c, d, b, sp, bp, si, di, 8-15, ip
-Reg regs[17];
+Reg regs[17] = { 0 };
 // order: ss, cs, ds, es, fs, gs
-u16 sregs[6];
-FloatReg fregs[16];
-MMXReg xregs[16];
-u64 stregs[8];
+u16 sregs[6] = { 0 };
+FloatReg fregs[16] = { 0 };
+MMXReg xregs[16] = { 0 };
+u64 stregs[8] = { 0 };
 Flags f = {0, .f.on = 1 };
 bool oper = false; // operand override prefix
 bool addr = false; // address override prefix
@@ -30,9 +30,6 @@ void ASM_init() {
     }
     for (int i = 0; i < 16; i++) {
         fregs[i].yd = _mm256_set1_pd(0.0);
-    }
-    for (int i = 0; i < 6; i++) {
-        sregs[i] = 0;
     }
 }
 

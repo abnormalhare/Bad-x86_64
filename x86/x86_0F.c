@@ -82,6 +82,72 @@ void ASM_0F_45(Data *data) {
     ASM_end();
 }
 
+// MOVD mm/xmm, r/m(32) / MOVQ mm/xmm, r/m(64)
+void ASM_0F_6E(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_MMX);
+    ASM_incIP(2, &rm);
+
+    if (rm.isPtr) {
+        u64 reg =  ASM_getReg(rm.areg, rm.atype);
+
+        switch (rm.otype) {
+            case R_MMX: {
+                if (rm.atype == R_Bit32) {
+                    STACK32(temp, reg + data->disp);
+                    xregs[rm.oreg].u = *temp;
+                } else {
+                    STACK64(temp, reg + data->disp);
+                    xregs[rm.oreg].u = *temp;
+                }
+            }
+            case R_Float128: {
+                if (rm.atype == R_Bit32) {
+                    STACK32(temp, reg + data->disp);
+                    fregs[rm.oreg].xi = _mm_cvtsi32_si128(*temp);
+                } else {
+                    STACK64(temp, reg + data->disp);
+                    fregs[rm.oreg].xi = _mm_cvtsi64_si128(*temp);
+                }
+            }
+            default: break;
+        }
+
+        if (rm.otype == R_MMX) {
+            ASM_rmPrint("MOVD", &rm, data->disp, v_Reg, true);
+        } else {
+            ASM_rmPrint("MOVQ", &rm, data->disp, v_Reg, true);
+        }
+    } else {
+        rm.atype = IS_W(R_Bit32, R_Bit64);
+        switch (rm.otype) {
+            case R_MMX:
+                if (rm.atype == R_Bit32) {
+                    xregs[rm.oreg].u = regs[rm.areg].e;
+                } else {
+                    xregs[rm.oreg].u = regs[rm.areg].r;
+                }
+                break;
+            case R_Float128:
+                if (rm.atype == R_Bit32) {
+                    fregs[rm.oreg].xi = _mm_cvtsi32_si128(regs[rm.areg].e);
+                } else {
+                    fregs[rm.oreg].xi = _mm_cvtsi64_si128(regs[rm.areg].r);
+                }
+                break;
+            default: break;
+        }
+        
+        if (rm.otype == R_MMX) {
+            printf("MOVD %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+        } else {
+            printf("MOVQ %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+        }
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 bool ASM_0F_85(Data *data) {
     Reg conv = { .e = data->val };
     ASM_incIP(IS_OP(6, 4), NULL);
@@ -275,7 +341,7 @@ void ASM_0F_B1(Data *data) {
     ASM_end();
 }
 
-// MOV r/m(16-64), r(8)
+// MOVZX r/m(16-64), r(8)
 void ASM_0F_B6(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
     ASM_incIP(2, &rm);
@@ -316,7 +382,7 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 3X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 4X */ 0, 0, 0, 0, 0, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 5X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* 6X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* 6X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_6E, 0, 
 /* 7X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 8X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 9X */ 0, 0, 0, 0, 0, ASM_0F_95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 

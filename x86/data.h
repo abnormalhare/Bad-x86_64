@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include <Windows.h>
+#include <intrin.h>
 #include <mmintrin.h>
 #include <immintrin.h>
 #include <emmintrin.h>
@@ -50,7 +51,10 @@ typedef union _float_reg {
     u32 u[16];
 } FloatReg;
 
-typedef __m64 MMXReg;
+typedef union _mmx_reg {
+    __m64 m;
+    u64 u;
+} MMXReg;
 
 typedef struct _flag {
 // byte 0
