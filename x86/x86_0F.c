@@ -136,8 +136,8 @@ void ASM_0F_B1(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
     ASM_incIP(3, &rm);
 
-    Reg prev;
-    Reg res;
+    Reg prev = { 0 };
+    Reg res = { 0 };
 
     if (rm.isPtr) {
         u64 reg = ASM_getReg(rm.areg, rm.atype);
@@ -219,5 +219,3 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* EX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* FX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 };
-
-#define ASM_0F_I(ix, data, t) if (ASM_0F_## ix (data)) goto JMP_##t; ASM_end()

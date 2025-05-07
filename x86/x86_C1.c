@@ -1,8 +1,8 @@
 #include "data.h"
 
 void ASM_C1SHL(RM *rm, s32 disp, u8 val) {
-    Reg prev;
-    Reg res;
+    Reg prev = { 0 };
+    Reg res = { 0 };
     
     if (rm->isPtr) {
         u64 reg = ASM_getReg(rm->areg, rm->atype);

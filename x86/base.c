@@ -122,7 +122,7 @@ ASM_codeFunc ASM_getFunc(u64 ip) {
 }
 
 u64 ASM_getReg(u8 index, RegType type) {
-    u64 reg;
+    u64 reg = 0;
 
     switch (type) {
         case R_Bit8:     reg =  regs[index].l; break;
@@ -190,6 +190,12 @@ void ASM_setFlags(Reg *prev, Reg *res, RegType type, bool borrow) {
 
 char *ASM_getRegName(u8 index, RegType type) {
     char *buf = (char *)malloc(6 * sizeof(char));
+    if (buf == NULL) {
+        printf("ERROR: getRegName buffer is NULL");
+        exit(EXIT_FAILURE);
+        return;
+    }
+
     memset(buf, 0, 6);
 
     if (IS_INT(type)) {
@@ -282,6 +288,8 @@ char *ASM_getRegName(u8 index, RegType type) {
             case 5: buf[0] = 'g'; break;
         }
         buf[1] = 's';
+    } else {
+        buf[0] = 'E'; buf[1] = 'R'; buf[2] = 'R';
     }
 
     return buf;
@@ -343,7 +351,7 @@ void ASM_rmPrint(const char *name, RM *rm, u32 disp, opVal val, bool flip) {
     }
 
     if (rm->atype == R_Seg) {
-        sprintf_s(buf, 256, "%s%s:[rip", buf, ASM_getRegName(rm->areg, rm->atype), ASM_getRegName(rm->oreg, rm->otype));
+        sprintf_s(buf, 256, "%s%s:[rip", buf, ASM_getRegName(rm->areg, rm->atype));
         
         if      (rm->disp == 1) sprintf_s(buf, 256, "%s %c %#.2X]", buf, ASM_S(), sDisp);
         else if (rm->disp == 4) sprintf_s(buf, 256, "%s %c %#.8X]", buf, ASM_S(), disp);

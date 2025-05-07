@@ -37,6 +37,4 @@ int main() {
 }
 ```
 
-The bfsvc.c file is an example you can look at for additional help
-
 Checkout checklist.txt to see the currently implemented opcodes!

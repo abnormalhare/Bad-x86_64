@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdatomic.h>
 
 #include <Windows.h>
 #include <mmintrin.h>
@@ -213,14 +212,14 @@ u8 *stack;
 void ASM_init();
 RM ASM_getRM(u8 rm, u8 sib, RegType type);
 ASM_codeFunc ASM_getFunc(u64 ip);
-void ASM_setFlags(Reg *prev, Reg *res, RegType type, bool borrow);
 u64 ASM_getReg(u8 index, RegType type);
-char *ASM_getRegName(u8 index, RegType type);
 void ASM_incIP(uint16_t num, RM *rm);
-bool ASM_getParity(u8 num);
+void ASM_setFlags(Reg *prev, Reg *res, RegType type, bool borrow);
+char *ASM_getRegName(u8 index, RegType type);
+const char* ASM_ptrName(RegType bits);
 void ASM_rmPrint(const char *name, RM *rm, u32 disp, opVal val, bool flip);
 void ASM_rexPrint(void);
-// void ASM_regPrint(void);
+void ASM_regPrint(void);
 void ASM_end(void);
 
 #endif /* EBA6F15E_AF03_4213_BEF3_CE3839FA5FFA */

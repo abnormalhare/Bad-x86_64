@@ -1,4 +1,4 @@
-#include "base.c"
+#include "x86.h"
 
 // ADD r/m(16-64), r(16-64)
 void ASM_01(u8 rm_code, u8 sib, s32 disp) {
@@ -85,8 +85,8 @@ void ASM_23(u8 rm_code, u8 sib, s32 disp) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(2, &rm);
 
-    Reg prev;
-    Reg res;
+    Reg prev = { 0 };
+    Reg res = { 0 };
     
     if (rm.isPtr) {
         u64 reg = ASM_getReg(rm.areg, rm.atype);
@@ -137,8 +137,8 @@ void ASM_31(u8 rm_code, u8 sib, s32 disp) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(2, &rm);
 
-    Reg prev;
-    Reg res;
+    Reg prev = { 0 };
+    Reg res = { 0 };
     
     if (rm.isPtr) {
         u64 reg = ASM_getReg(rm.areg, rm.atype);
@@ -185,8 +185,8 @@ void ASM_33(u8 rm_code, u8 sib, s32 disp) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(2, &rm);
 
-    Reg prev;
-    Reg res;
+    Reg prev = { 0 };
+    Reg res = { 0 };
     
     if (rm.isPtr) {
         u64 reg = ASM_getReg(rm.areg, rm.atype);
@@ -235,8 +235,8 @@ void ASM_39(u8 rm_code, u8 sib, s32 disp) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(2, &rm);
 
-    Reg prev;
-    Reg res;
+    Reg prev = { 0 };
+    Reg res = { 0 };
     
     if (rm.isPtr) {
         u64 reg = ASM_getReg(rm.areg, rm.atype);
@@ -277,8 +277,8 @@ void ASM_3B(u8 rm_code, u8 sib, s32 disp) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(2, &rm);
 
-    Reg prev;
-    Reg res;
+    Reg prev = { 0 };
+    Reg res = { 0 };
     
     if (rm.isPtr) {
         u64 reg = ASM_getReg(rm.areg, rm.atype);
@@ -432,8 +432,6 @@ bool _ASM_73(s8 val) {
     ASM_end();
     return true;
 }
-// JNB rel(8)
-#define ASM_73(val, t) if (_ASM_73(val)) goto JMP_##t
 
 // JZ rel(8)
 bool _ASM_74(s8 val) {
@@ -453,8 +451,6 @@ bool _ASM_74(s8 val) {
     ASM_end();
     return true;
 }
-// JZ rel(8)
-#define ASM_74(val, t) if (_ASM_74(val)) goto JMP_##t
 
 // JNZ rel(8)
 bool _ASM_75(s8 val) {
@@ -477,8 +473,6 @@ bool _ASM_75(s8 val) {
     ASM_end();
     return true;
 }
-// JNZ rel(8)
-#define ASM_75(val, t) if (_ASM_75(val)) goto JMP_##t
 
 // JBE rel(8)
 bool _ASM_76(s8 val) {
@@ -501,8 +495,6 @@ bool _ASM_76(s8 val) {
     ASM_end();
     return true;
 }
-// JBE rel(8)
-#define ASM_76(val, t) if (_ASM_76(val)) goto JMP_##t
 
 // JA rel(8)
 bool _ASM_77(s8 val) {
@@ -525,8 +517,6 @@ bool _ASM_77(s8 val) {
     ASM_end();
     return true;
 }
-// JA rel(8)
-#define ASM_77(val, t) if (_ASM_77(val)) goto JMP_##t
 
 // JL rel(8)
 bool _ASM_7C(s8 val) {
@@ -549,8 +539,6 @@ bool _ASM_7C(s8 val) {
     ASM_end();
     return true;
 }
-// JL rel(8)
-#define ASM_7C(val, t) if (_ASM_7C(val)) goto JMP_##t
 
 #include "x86_81.c"
 void ASM_81(u8 rm, u8 sib, s32 disp, u32 val) {
@@ -576,8 +564,9 @@ void ASM_83(u8 rm, u8 sib, s32 disp, u8 val) {
 
 // TEST r/m(16-64), r(16-64)
 void ASM_85(u8 rm_code, u8 sib, s32 disp) {
-    Reg prev;
-    Reg res;
+    Reg prev = { 0 };
+    Reg res = { 0 };
+
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(2, &rm);
     
@@ -706,7 +695,7 @@ void ASM_8D(u8 rm_code, u8 sib, s32 disp) {
 }
 
 // NOP
-void ASM_90() {
+void ASM_90(void) {
     ASM_incIP(1, NULL);
 
     printf("NOP");
@@ -764,7 +753,7 @@ void ASM_C3(void) {
 // 0xD4-D6 invalid
 
 // CALL rel(16/32)
-void ASM_E8(uint32_t val) {
+void ASM_E8(u32 val) {
     ASM_codeFunc func;
     Reg conv;
 
@@ -789,7 +778,7 @@ void ASM_E8(uint32_t val) {
 }
 
 // JMP rel(16/32)
-void ASM_E9(uint32_t val) {
+void ASM_E9(u32 val) {
     ASM_codeFunc func;
     Reg conv;
 
