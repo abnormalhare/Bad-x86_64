@@ -5,27 +5,38 @@ void ASM_01(u8 rm_code, u8 sib, s32 disp) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(2, &rm);
 
+    Reg prev = { 0 };
+    Reg res = { 0 };
+
     if (rm.isPtr) {
-        u64 reg = (regs[rm.areg].e);
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
 
         switch (rm.otype) {
-            case R_Bit16: { STACK16(temp, reg + disp); *temp += regs[rm.oreg].x; break; }
-            case R_Bit32: { STACK32(temp, reg + disp); *temp += regs[rm.oreg].e; break; }
-            case R_Bit64: { STACK64(temp, reg + disp); *temp += regs[rm.oreg].r; break; }
+            case R_Bit16: { STACK16(temp, reg + disp); prev.x = *temp; *temp += regs[rm.oreg].x; break; }
+            case R_Bit32: { STACK32(temp, reg + disp); prev.e = *temp; *temp += regs[rm.oreg].e; break; }
+            case R_Bit64: { STACK64(temp, reg + disp); prev.r = *temp; *temp += regs[rm.oreg].r; break; }
             default: break;
         }
 
         ASM_rmPrint("ADD", &rm, disp, v_Reg, false);
     } else {
         switch (rm.otype) {
-            case R_Bit16: regs[rm.areg].x += regs[rm.oreg].x; break;
-            case R_Bit32: regs[rm.areg].e += regs[rm.oreg].e; regs[rm.areg].eh = 0; break;
-            case R_Bit64: regs[rm.areg].r += regs[rm.oreg].r; break;
+            case R_Bit16: prev.x = regs[rm.areg].x; regs[rm.areg].x += regs[rm.oreg].x; break;
+            case R_Bit32: prev.x = regs[rm.areg].e; regs[rm.areg].e += regs[rm.oreg].e; regs[rm.areg].eh = 0; break;
+            case R_Bit64: prev.x = regs[rm.areg].r; regs[rm.areg].r += regs[rm.oreg].r; break;
             default: break;
         }
         printf("ADD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
     }
 
+    switch (rm.otype) {
+        case R_Bit16: res.x = prev.x + regs[rm.oreg].x; prev.x = regs[rm.oreg].x; break;
+        case R_Bit32: res.e = prev.e + regs[rm.oreg].e; prev.e = regs[rm.oreg].e; break;
+        case R_Bit64: res.r = prev.r + regs[rm.oreg].r; prev.r = regs[rm.oreg].r; break;
+        default: break;
+    }
+
+    ASM_setFlags(&prev, &res, rm.otype, false);
     ASM_rexPrint();
     ASM_end();
 }
@@ -35,27 +46,38 @@ void ASM_03(u8 rm_code, u8 sib, s32 disp) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(2, &rm);
 
+    Reg prev = { 0 };
+    Reg res = { 0 };
+
     if (rm.isPtr) {
-        u64 reg = (regs[rm.areg].e);
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
 
         switch (rm.otype) {
-            case R_Bit16: { STACK16(temp, reg + disp); regs[rm.oreg].x += *temp; break; }
-            case R_Bit32: { STACK32(temp, reg + disp); regs[rm.oreg].e += *temp; break; }
-            case R_Bit64: { STACK64(temp, reg + disp); regs[rm.oreg].r += *temp; break; }
+            case R_Bit16: { STACK16(temp, reg + disp); prev.x = *temp; regs[rm.oreg].x += *temp; break; }
+            case R_Bit32: { STACK32(temp, reg + disp); prev.e = *temp; regs[rm.oreg].e += *temp; break; }
+            case R_Bit64: { STACK64(temp, reg + disp); prev.r = *temp; regs[rm.oreg].r += *temp; break; }
             default: break;
         }
 
         ASM_rmPrint("ADD", &rm, disp, v_Reg, true);
     } else {
         switch (rm.otype) {
-            case R_Bit16: regs[rm.oreg].x += regs[rm.areg].x; break;
-            case R_Bit32: regs[rm.oreg].e += regs[rm.areg].e; regs[rm.oreg].eh = 0; break;
-            case R_Bit64: regs[rm.oreg].r += regs[rm.areg].r; break;
+            case R_Bit16: prev.x = regs[rm.areg].x; regs[rm.oreg].x += regs[rm.areg].x; break;
+            case R_Bit32: prev.x = regs[rm.areg].e; regs[rm.oreg].e += regs[rm.areg].e; regs[rm.oreg].eh = 0; break;
+            case R_Bit64: prev.x = regs[rm.areg].r; regs[rm.oreg].r += regs[rm.areg].r; break;
             default: break;
         }
         printf("ADD %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
     }
 
+    switch (rm.otype) {
+        case R_Bit16: res.x = prev.x + regs[rm.oreg].x; break;
+        case R_Bit32: res.e = prev.e + regs[rm.oreg].e; break;
+        case R_Bit64: res.r = prev.r + regs[rm.oreg].r; break;
+        default: break;
+    }
+
+    ASM_setFlags(&prev, &res, rm.otype, false);
     ASM_rexPrint();
     ASM_end();
 }
@@ -112,7 +134,7 @@ void ASM_23(u8 rm_code, u8 sib, s32 disp) {
 
     switch (rm.otype) {
         case R_Bit16: res.x = prev.x & regs[rm.oreg].x; prev.x = regs[rm.oreg].x; break;
-        case R_Bit32: res.e = prev.e & regs[rm.oreg].e; prev.e = regs[rm.oreg].r; break;
+        case R_Bit32: res.e = prev.e & regs[rm.oreg].e; prev.e = regs[rm.oreg].e; break;
         case R_Bit64: res.r = prev.r & regs[rm.oreg].r; prev.r = regs[rm.oreg].r; break;
         default: break;
     }
@@ -637,7 +659,7 @@ void ASM_89(u8 rm_code, u8 sib, s32 disp) {
     ASM_incIP(2, &rm);
 
     if (rm.isPtr) {
-        u64 reg = (regs[rm.areg].e);
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, reg + disp); *temp = regs[rm.oreg].x; break; }
@@ -780,7 +802,7 @@ void ASM_C7(u8 rm_code, u8 sib, s32 disp, u32 val) {
     ASM_incIP((rm.otype == R_Bit16) ? 4 : 6, &rm);
 
     if (rm.isPtr) {
-        u64 reg = (regs[rm.areg].e);
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, reg + disp); *temp = (u16)val; break; }

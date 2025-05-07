@@ -136,6 +136,76 @@ void ASM_0F_95(Data *data) {
     ASM_end();
 }
 
+// IMUL r(16-64), r/m(16-64)
+void ASM_0F_AF(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
+    ASM_incIP(2, &rm);
+
+    Reg prev = { 0 };
+    Reg res = { 0 };
+    s64 val = 0;
+
+    if (rm.isPtr) {
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
+
+        switch (rm.otype) {
+            case R_Bit16: {
+                STACK16(temp, reg + data->disp); prev.x = *temp;
+                val = (s16)*temp * (s16)regs[rm.oreg].x;
+                regs[rm.oreg].x = val;
+                break;
+            }
+            case R_Bit32: {
+                STACK32(temp, reg + data->disp); prev.e = *temp;
+                val = (s32)*temp * (s32)regs[rm.oreg].e;
+                regs[rm.oreg].e = val;
+                break; 
+            }
+            case R_Bit64: {
+                STACK64(temp, reg + data->disp); prev.r = *temp;
+                val = (s32)*temp * (s32)regs[rm.oreg].r;
+                regs[rm.oreg].r = val;
+                break;
+            }
+            default: break;
+        }
+
+        ASM_rmPrint("IMUL", &rm, data->disp, v_Reg, true);
+    } else {
+        switch (rm.otype) {
+            case R_Bit16:
+                prev.x = regs[rm.areg].x;
+                val = (s16)regs[rm.areg].x * (s16)regs[rm.oreg].x;
+                regs[rm.oreg].x = val;
+                break;
+            case R_Bit32:
+                prev.x = regs[rm.areg].e;
+                val = (s32)regs[rm.areg].e * (s32)regs[rm.oreg].e;
+                regs[rm.oreg].e = val;
+                regs[rm.oreg].eh = 0;
+                break;
+            case R_Bit64:
+                prev.x = regs[rm.areg].r;
+                val = (s64)regs[rm.areg].r * (s64)regs[rm.oreg].r;
+                regs[rm.oreg].r = val;
+                break;
+            default: break;
+        }
+        printf("IMUL %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+    }
+
+    switch (rm.otype) {
+        case R_Bit16: res.x = val; break;
+        case R_Bit32: res.e = val; break;
+        case R_Bit64: res.r = val; break;
+        default: break;
+    }
+
+    ASM_setFlags(&prev, &res, rm.otype, false);
+    ASM_rexPrint();
+    ASM_end();
+}
+
 void ASM_0F_B1(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
     ASM_incIP(3, &rm);
@@ -205,6 +275,40 @@ void ASM_0F_B1(Data *data) {
     ASM_end();
 }
 
+// MOV r/m(16-64), r(8)
+void ASM_0F_B6(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
+    ASM_incIP(2, &rm);
+
+    RegType type = (rex.enable != 0 && rm.oreg >= 4 && rm.oreg < 8) ? R_Bit8H : R_Bit8;
+    u64 oreg = ASM_getReg(rm.oreg, type);
+
+    if (rm.isPtr) {
+        u64 reg =  ASM_getReg(rm.areg, rm.atype);
+
+        switch (rm.otype) {
+            case R_Bit16: { STACK16(temp, reg + data->disp); *temp = oreg; break; }
+            case R_Bit32: { STACK32(temp, reg + data->disp); *temp = oreg; break; }
+            case R_Bit64: { STACK64(temp, reg + data->disp); *temp = oreg; break; }
+            default: break;
+        }
+
+        rm.otype = type;
+        ASM_rmPrint("MOVZX", &rm, data->disp, v_Reg, false);
+    } else {
+        switch (rm.otype) {
+            case R_Bit16: regs[rm.areg].x = oreg; break;
+            case R_Bit32: regs[rm.areg].e = oreg; regs[rm.areg].eh = 0; break;
+            case R_Bit64: regs[rm.areg].r = oreg; break;
+            default: break;
+        }
+        printf("MOVZX %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, type));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 0X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 1X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
@@ -216,8 +320,8 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 7X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 8X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 9X */ 0, 0, 0, 0, 0, ASM_0F_95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* AX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* BX */ 0, ASM_0F_B1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* AX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_AF, 
+/* BX */ 0, ASM_0F_B1, 0, 0, 0, 0, ASM_0F_B6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* CX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* DX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* EX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
