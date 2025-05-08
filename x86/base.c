@@ -188,6 +188,13 @@ void ASM_setFlags(Reg *prev, Reg *res, RegType type, bool borrow) {
     f.f.pf = ASM_getParity(res->l);
     f.f.af = (((prev->l & 0x18) ^ (res->l & 0x18)) == 0x18);
     switch (type) {
+        case R_Bit8: case R_Bit8H:
+            if (borrow) f.f.cf = (res->l > prev->l);
+            else        f.f.cf = (res->l < prev->l);
+            f.f.zf = (res->l == 0);
+            f.f.sf = ((s8)res->l < 0);
+            f.f.of = ((res->l & 0x8000) != (prev->l & 0x8000));
+            break;
         case R_Bit16:
             if (borrow) f.f.cf = (res->x > prev->x);
             else        f.f.cf = (res->x < prev->x);
@@ -405,7 +412,7 @@ void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip) {
     } else if (rm->areg == 16) {
         sprintf_s(buf, 256, "%s%s [", buf, ASM_ptrName(rm->ptrtype), ASM_getRegName(rm->areg, rm->atype));
 
-        if (ASM_sign) sDisp = -sDisp; disp = -disp;
+        if (ASM_sign) { sDisp = -sDisp; disp = -disp; }
         if      (rm->disp == 1) sprintf_s(buf, 256, "%s%#.8X", buf, sDisp + regs[16].e);
         else if (rm->disp == 4) sprintf_s(buf, 256, "%s%#.8X", buf, disp + regs[16].e);
     } else {
@@ -427,6 +434,7 @@ void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip) {
         sprintf_s(buf, 256, "%s]", buf);
     }
     printf_s(buf);
+    ASM_sign = false;
 }
 
 void ASM_regPrint(void) {

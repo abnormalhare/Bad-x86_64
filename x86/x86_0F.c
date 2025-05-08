@@ -4,10 +4,44 @@ void ASM_0F_1F(Data *data) {
     // NOP
 }
 
+// MOV(L)HPS xmm, mm/xmm
+// NOTE: MOVHPD and MOVSHDUP unimplemented
+void ASM_0F_16(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Float128);
+    ASM_incIP(3, &rm);
+
+    if (rm.isPtr) {
+        // MOVHPS: Load high quadword from memory into the high part of the XMM register
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
+        if (rm.disp == 1) data->disp = (s8)data->disp;
+
+        STACK64(temp, reg + data->disp);
+        __m128 temp128 = _mm_castsi128_ps(fregs[rm.oreg].xi); // Cast __m128i to __m128
+        temp128 = _mm_loadh_pi(temp128, (const __m64 *)temp);
+        fregs[rm.oreg].xi = _mm_castps_si128(temp128); // Cast back to __m128i
+
+        rm.otype = R_Float128;
+        ASM_rmPrint("MOVHPS", &rm, data->disp, v_Reg, true);
+    } else {
+        // MOVLHPS: Move low quadword of one XMM register to the high quadword of another
+        __m128 src = _mm_castsi128_ps(fregs[rm.areg].xi); // Source XMM register
+        __m128 dest = _mm_castsi128_ps(fregs[rm.oreg].xi); // Destination XMM register
+        dest = _mm_movelh_ps(dest, src); // Move low quadword of src to high quadword of dest
+        fregs[rm.oreg].xi = _mm_castps_si128(dest); // Cast back to __m128i
+
+        rm.atype = R_Float128;
+        rm.otype = R_Float128;
+        printf("MOVLHPS %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // CMOVZ r(16-64), r/m(16-64)
 void ASM_0F_44(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
-    ASM_incIP(2, &rm);
+    ASM_incIP(3, &rm);
     
     if (rm.isPtr) {
         u64 reg = ASM_getReg(rm.areg, rm.atype);
@@ -85,10 +119,11 @@ void ASM_0F_45(Data *data) {
 // MOVD mm/xmm, r/m(32) / MOVQ mm/xmm, r/m(64)
 void ASM_0F_6E(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_MMX);
-    ASM_incIP(2, &rm);
+    ASM_incIP(3, &rm);
 
     if (rm.isPtr) {
-        u64 reg =  ASM_getReg(rm.areg, rm.atype);
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
+        if (rm.disp == 1) data->disp = (s8)data->disp;
 
         switch (rm.otype) {
             case R_MMX: {
@@ -148,6 +183,39 @@ void ASM_0F_6E(Data *data) {
     ASM_end();
 }
 
+// JNB long
+void ASM_0F_83(Data *data) {
+    Reg conv = { .e = data->val };
+    ASM_incIP(IS_OP(6, 4), NULL);
+
+    if (!oper) {
+        printf("JNB 0x%.4X", conv.e);
+    } else {
+        printf("JNB 0x%.2X", conv.l);
+    }
+    
+    if (f.f.cf) { // if carry, dont jump
+        ASM_rexPrint();
+        ASM_end();
+        return;
+    }
+
+    if (!oper) {
+        regs[16].x += conv.e;
+    } else {
+        regs[16].e += conv.l;
+    }
+    printf(" -> PASSED");
+
+
+    ASM_rexPrint();
+    ASM_end();
+
+    ASM_codeFunc func = ASM_getCurrFunc();
+    func();
+}
+
+// JZ long
 bool ASM_0F_85(Data *data) {
     Reg conv = { .e = data->val };
     ASM_incIP(IS_OP(6, 4), NULL);
@@ -205,7 +273,7 @@ void ASM_0F_95(Data *data) {
 // IMUL r(16-64), r/m(16-64)
 void ASM_0F_AF(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
-    ASM_incIP(2, &rm);
+    ASM_incIP(3, &rm);
 
     Reg prev = { 0 };
     Reg res = { 0 };
@@ -344,7 +412,7 @@ void ASM_0F_B1(Data *data) {
 // MOVZX r/m(16-64), r(8)
 void ASM_0F_B6(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
-    ASM_incIP(2, &rm);
+    ASM_incIP(3, &rm);
 
     RegType type = (rex.enable != 0 && rm.oreg >= 4 && rm.oreg < 8) ? R_Bit8H : R_Bit8;
     u64 oreg = ASM_getReg(rm.oreg, type);
@@ -377,14 +445,14 @@ void ASM_0F_B6(Data *data) {
 
 ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 0X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* 1X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
+/* 1X */ 0, 0, 0, 0, 0, 0, ASM_0F_16, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
 /* 2X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 3X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 4X */ 0, 0, 0, 0, 0, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 5X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 6X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_6E, 0, 
 /* 7X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* 8X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* 8X */ 0, 0, 0, ASM_0F_83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 9X */ 0, 0, 0, 0, 0, ASM_0F_95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* AX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_AF, 
 /* BX */ 0, ASM_0F_B1, 0, 0, 0, 0, ASM_0F_B6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 

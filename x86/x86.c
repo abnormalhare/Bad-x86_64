@@ -436,6 +436,25 @@ void ASM_67(void) {
     addr = true;
 }
 
+// JB rel(8)
+bool _ASM_72(s8 val) {
+    ASM_incIP(2, NULL);
+    
+    printf("JB 0x%.2X", (u8)val);
+    if (!f.f.cf) { // if not carry, dont jump
+        ASM_rexPrint();
+        ASM_end();
+        return false;
+    }
+
+    regs[16].e += val;
+    printf(" -> PASSED");
+    
+    ASM_rexPrint();
+    ASM_end();
+    return true;
+}
+
 // JNB rel(8)
 bool _ASM_73(s8 val) {
     ASM_incIP(2, NULL);
@@ -904,10 +923,20 @@ void ASM_F0(void) {
     lock = true;
 }
 
+#include "x86_F6.c"
+void ASM_F6(u8 rm, u8 sib, s32 disp, u8 val) {
+    RM ret = ASM_getRM(rm, sib, R_Bit8);
+    ASM_incIP(3, &ret);
+
+    ASM_F6Funcs[ret.reg](&ret, disp, val);
+
+    ASM_end();
+}
+
 #include "x86_F7.c"
 void ASM_F7(u8 rm, u8 sib, s32 disp, u8 val) {
     RM ret = ASM_getRM(rm, sib, R_Bit32);
-    ASM_incIP(2, &ret);
+    ASM_incIP(3, &ret);
 
     ASM_F7Funcs[ret.reg](&ret, disp, val);
 

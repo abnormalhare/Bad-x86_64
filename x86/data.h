@@ -191,13 +191,21 @@ extern u8 *stack;
 #define ALIGN_STACK_256 31
 #define ALIGN_STACK_512 63
 
-#define STACK8(n, v) u8*n = (u8*)&stack[v]
-#define STACK16(n, v) u16*n = (u16*)&stack[v]
-#define STACK32(n, v) u32*n = (u32*)&stack[v]
-#define STACK64(n, v) u64*n = (u64*)&stack[v]
-#define STACK128(n, v) __m128i*n = (__m128i*)&stack[v]
-#define STACK256(n, v) __m256i*n = (__m256i*)&stack[v]
-#define STACK512(n, v) __m512i*n = (__m512i*)&stack[v]
+#define STACK8P(n, v) n = (u8*)&stack[v]
+#define STACK16P(n, v) n = (u16*)&stack[v]
+#define STACK32P(n, v) n = (u32*)&stack[v]
+#define STACK64P(n, v) n = (u64*)&stack[v]
+#define STACK128P(n, v) n = (__m128i*)&stack[v]
+#define STACK256P(n, v) n = (__m256i*)&stack[v]
+#define STACK512P(n, v) n = (__m512i*)&stack[v]
+
+#define STACK8(n, v) u8*n; STACK8P(n, v)
+#define STACK16(n, v) u16*n; STACK16P(n, v)
+#define STACK32(n, v) u32*n; STACK32P(n, v)
+#define STACK64(n, v) u64*n; STACK64P(n, v)
+#define STACK128(n, v) __m128i*n; STACK128P(n, v)
+#define STACK256(n, v) __m256i*n; STACK256P(n, v)
+#define STACK512(n, v) __m512i*n; STACK512P(n, v)
 
 #define IS_INT(type) (((type) == R_Bit8) || ((type) == R_Bit8H) || ((type) == R_Bit16) || ((type) == R_Bit32) || ((type) == R_Bit64))
 #define IS_FLOAT(type) (((type) == R_Float32) || ((type) == R_Float64) || ((type) == R_Float128) || ((type) == R_Float256) || ((type) == R_Float512))
