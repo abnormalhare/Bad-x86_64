@@ -120,8 +120,8 @@ void ASM_0F_29(Data *data) {
     if (rm.disp == 1) data->disp = (s8)data->disp;
 
     // check if aligned
-    if ((reg + data->disp) / 4 + 4 != reg + data->disp) {
-        printf("GENERAL PROTECTION FAULT: 0F 29");
+    if (((reg + data->disp) / 4) * 4 != reg + data->disp) {
+        printf("GENERAL PROTECTION FAULT: %.8X", (u32)reg + data->disp);
         exit(EXIT_FAILURE);
     }
     
@@ -151,6 +151,9 @@ void ASM_0F_29(Data *data) {
         else
             printf("MOVAPD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
     }
+
+    ASM_rexPrint();
+    ASM_end();
 }
 
 // CMOVZ r(16-64), r/m(16-64)

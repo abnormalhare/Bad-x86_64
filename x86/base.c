@@ -342,15 +342,19 @@ const char *ASM_ptrName(RegType bits) {
 }
 
 void ASM_rexPrint(void) {
-    printf("\n  | IP:%.8X  REX w:%d r:%d x:%d b:%d  F: %d%d%d%d%d%d%d%d | STACK (%.8X):", regs[16].e, rex.w, rex.r, rex.x, rex.b, f.f.of, f.f.df, f.f.iF, f.f.sf, f.f.zf, f.f.af, f.f.pf, f.f.cf, regs[4].e);
+    printf("\n  | IP:%.8X | A:%.8X C:%.8X  D:%.8X  B:%.8X | XMM0:%.8X%.8X%.8X%.8X | SP:%.8X :", regs[16].e, regs[0].e, regs[1].e, regs[2].e, regs[3].e, fregs[0].u[0], fregs[0].u[1], fregs[0].u[2], fregs[0].u[3], regs[4].e);
+    
     int sp = regs[4].e;
-    if (sp < 0x80000000) {
-        int j = 0;
+    if (sp < 0x80000000)
         printf(" %.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X\n",
-            stack[sp + j], stack[sp + j + 1], stack[sp + j + 2], stack[sp + j + 3], stack[sp + j + 4], stack[sp + j + 5], stack[sp + j + 6], stack[sp + j + 7]);
-    } else {
-        printf(" INVALID\n");
-    }
+                stack[sp], stack[sp + 1], stack[sp + 2], stack[sp + 3], stack[sp + 4], stack[sp + 5], stack[sp + 6], stack[sp + 7]);
+    
+    printf("  | BP:%.8X | 8:%.8X 9:%.8X 10:%.8X 11:%.8X | XMM1:%.8X%.8X%.8X%.8X |             :", regs[5].e, regs[8].e, regs[9].e, regs[10].e, regs[11].e, fregs[1].u[0], fregs[1].u[1], fregs[1].u[2], fregs[1].u[3]);
+
+    sp = regs[4].e + 8;
+    if (sp < 0x80000000)
+        printf(" %.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X\n",
+                stack[sp], stack[sp + 1], stack[sp + 2], stack[sp + 3], stack[sp + 4], stack[sp + 5], stack[sp + 6], stack[sp + 7]);
 }
 
 bool ASM_sign = false;
