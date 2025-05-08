@@ -10,7 +10,8 @@ u64 stregs[8] = { 0 };
 Flags f = {0, .f.on = 1 };
 bool oper = false; // operand override prefix
 bool addr = false; // address override prefix
-bool dup  = false; // float   override prefix
+bool doub = false; // double  override prefix
+bool sing = false; // float   override prefix
 bool fs   = false; // fs      override prefix
 bool gs   = false; // gs      override prefix
 bool lock = false; // lock prefix
@@ -469,19 +470,14 @@ void ASM_end(void) {
     rex.r = 0;
     rex.x = 0;
     rex.b = 0;
+
     oper = 0;
     addr = 0;
-    dup = 0;
+    doub = 0;
+    sing = 0;
     fs = 0;
     gs = 0;
     lock = 0;
-    ASM_sign = false;
-
-    // while (1) {
-    //     if (GetAsyncKeyState(VK_RETURN) & 0x8000) {
-    //         break;
-    //     }
-    // }
 }
 
 void ASM_exit(void) {

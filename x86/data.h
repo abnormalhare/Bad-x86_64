@@ -174,7 +174,8 @@ extern u64 stregs[8];
 extern Flags f;
 extern bool oper; // operand override prefix
 extern bool addr; // address override prefix
-extern bool dup; // float   override prefix
+extern bool doub; // double  override prefix
+extern bool sing; // float   override prefix
 extern bool fs; // fs      override prefix
 extern bool gs; // gs      override prefix
 extern bool lock; // lock prefix
@@ -194,7 +195,9 @@ extern u8 *stack;
 #define STACK8P(n, v) n = (u8*)&stack[v]
 #define STACK16P(n, v) n = (u16*)&stack[v]
 #define STACK32P(n, v) n = (u32*)&stack[v]
+#define STACK32FP(n, v) n = (f32*)&stack[v]
 #define STACK64P(n, v) n = (u64*)&stack[v]
+#define STACK64FP(n, v) n = (f64*)&stack[v]
 #define STACK128P(n, v) n = (__m128i*)&stack[v]
 #define STACK256P(n, v) n = (__m256i*)&stack[v]
 #define STACK512P(n, v) n = (__m512i*)&stack[v]
@@ -202,7 +205,9 @@ extern u8 *stack;
 #define STACK8(n, v) u8*n; STACK8P(n, v)
 #define STACK16(n, v) u16*n; STACK16P(n, v)
 #define STACK32(n, v) u32*n; STACK32P(n, v)
+#define STACK32F(n, v) f32*n; STACK32FP(n, v)
 #define STACK64(n, v) u64*n; STACK64P(n, v)
+#define STACK64F(n, v) f64*n; STACK64FP(n, v)
 #define STACK128(n, v) __m128i*n; STACK128P(n, v)
 #define STACK256(n, v) __m256i*n; STACK256P(n, v)
 #define STACK512(n, v) __m512i*n; STACK512P(n, v)
@@ -216,7 +221,7 @@ extern u8 *stack;
 #define IS_W(n, y) ((rex.w == false) ? (n) : (y))
 #define IS_OP(n, y) ((oper == false) ? (n) : (y))
 #define IS_AD(n, y) ((addr == false) ? (n) : (y))
-#define IS_DUP(n, y) ((dup == false && oper == false) ? (n) : (y))
+#define IS_DUP(n, y) ((doub == false && oper == false) ? (n) : (y))
 #define IS_REX(n, y) ((rex.enable == 0) ? (n) : (y))
 #define IS_FS(n, y) ((fs == false) ? (n) : (y))
 #define IS_GS(n, y) ((gs == false) ? (n) : (y))

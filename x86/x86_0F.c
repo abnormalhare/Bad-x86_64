@@ -1,7 +1,73 @@
 #include "data.h"
 
-void ASM_0F_1F(Data *data) {
-    // NOP
+//    MOVUPS r/m(xmm128), xmm
+// F3 MOVSS  r/m(xmm32), xmm
+// 66 MOVUPD r/m(xmm128), xmm
+// F2 MOVSD  r/m(xmm64), xmm
+void ASM_0F_11(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Float128);
+    ASM_incIP(3, &rm);
+
+    u64 reg = 0;
+    if (rm.isPtr) {
+        reg = ASM_getReg(rm.areg, rm.atype);
+    } else {
+        rm.atype = R_Float128;
+    }
+    rm.otype = R_Float128;
+    
+    if (rm.disp == 1) data->disp = (s8)data->disp;
+
+    if (doub) { // MOVSD
+        if (rm.isPtr) {
+            STACK64F(temp, reg + data->disp);
+            *temp = fregs[rm.oreg].d[0];
+            ASM_rmPrint("MOVSD", &rm, data->disp, v_Reg, false);
+        } else {
+            fregs[rm.areg].d[0] = fregs[rm.oreg].d[0];
+            printf("MOVSD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+        }
+    } else if (oper) { // MOVUPD
+        if (rm.isPtr) {
+            STACK64F(temp, reg + data->disp);
+            STACK64F(temp2, reg + data->disp + 8);
+            *temp  = fregs[rm.oreg].d[0];
+            *temp2 = fregs[rm.oreg].d[1];
+
+            ASM_rmPrint("MOVUPD", &rm, data->disp, v_Reg, false);
+        } else {
+            fregs[rm.areg].xi = fregs[rm.oreg].xi;
+            printf("MOVUPD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+        }
+    } else if (sing) { // MOVSS
+        if (rm.isPtr) {
+            STACK32F(temp, reg + data->disp);
+            *temp = fregs[rm.oreg].f[0];
+            ASM_rmPrint("MOVSS", &rm, data->disp, v_Reg, false);
+        } else {
+            fregs[rm.areg].f[0] = fregs[rm.oreg].f[0];
+            printf("MOVSS %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+        }
+    } else { // MOVUPS
+        if (rm.isPtr) {
+            STACK32F(temp1, reg + data->disp + 0x0);
+            STACK32F(temp2, reg + data->disp + 0x4);
+            STACK32F(temp3, reg + data->disp + 0x8);
+            STACK32F(temp4, reg + data->disp + 0xC);
+            *temp1 = fregs[rm.oreg].f[0];
+            *temp2 = fregs[rm.oreg].f[1];
+            *temp3 = fregs[rm.oreg].f[2];
+            *temp4 = fregs[rm.oreg].f[3];
+
+            ASM_rmPrint("MOVUPS", &rm, data->disp, v_Reg, false);
+        } else {
+            fregs[rm.areg].xi = fregs[rm.oreg].xi;
+            printf("MOVUPS %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+        }
+    }
+
+    ASM_rexPrint();
+    ASM_end();
 }
 
 // MOV(L)HPS xmm, mm/xmm
@@ -36,6 +102,55 @@ void ASM_0F_16(Data *data) {
 
     ASM_rexPrint();
     ASM_end();
+}
+
+void ASM_0F_1F(Data *data) {
+    // NOP
+}
+
+void ASM_0F_29(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Float128);
+    ASM_incIP(3, &rm);
+
+    u64 reg = 0;
+    if (rm.isPtr) reg = ASM_getReg(rm.areg, rm.atype);
+    else rm.atype = R_Float128;
+    rm.otype = R_Float128;
+    
+    if (rm.disp == 1) data->disp = (s8)data->disp;
+
+    // check if aligned
+    if ((reg + data->disp) / 4 + 4 != reg + data->disp) {
+        printf("GENERAL PROTECTION FAULT: 0F 29");
+        exit(EXIT_FAILURE);
+    }
+    
+    if (rm.isPtr) {
+        if (!oper) {
+            STACK32F(temp1, reg + data->disp + 0x0);
+            STACK32F(temp2, reg + data->disp + 0x4);
+            STACK32F(temp3, reg + data->disp + 0x8);
+            STACK32F(temp4, reg + data->disp + 0xC);
+            *temp1 = fregs[rm.oreg].f[0];
+            *temp2 = fregs[rm.oreg].f[1];
+            *temp3 = fregs[rm.oreg].f[2];
+            *temp4 = fregs[rm.oreg].f[3];
+            ASM_rmPrint("MOVAPS", &rm, data->disp, v_Reg, false);
+        } else {
+            STACK64F(temp1, reg + data->disp + 0x0);
+            STACK64F(temp2, reg + data->disp + 0x8);
+            *temp1 = fregs[rm.oreg].d[0];
+            *temp2 = fregs[rm.oreg].d[1];
+            ASM_rmPrint("MOVAPD", &rm, data->disp, v_Reg, false);
+        }
+
+    } else {
+        fregs[rm.areg].xi = fregs[rm.oreg].xi;
+        if (!oper)
+            printf("MOVAPS %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+        else
+            printf("MOVAPD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+    }
 }
 
 // CMOVZ r(16-64), r/m(16-64)
@@ -445,7 +560,7 @@ void ASM_0F_B6(Data *data) {
 
 ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 0X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* 1X */ 0, 0, 0, 0, 0, 0, ASM_0F_16, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
+/* 1X */ 0, ASM_0F_11, 0, 0, 0, 0, ASM_0F_16, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
 /* 2X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 3X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 4X */ 0, 0, 0, 0, 0, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 

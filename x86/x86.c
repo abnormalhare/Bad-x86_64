@@ -152,6 +152,47 @@ void ASM_23(u8 rm_code, u8 sib, s32 disp) {
 
 // 0x27 invalid
 
+// SUB r(16-64), r/m(16-64)
+void ASM_2B(u8 rm_code, u8 sib, s32 disp) {
+    RM rm = ASM_getRM(rm_code, sib, R_Bit32);
+    ASM_incIP(2, &rm);
+
+    Reg prev = { 0 };
+    Reg res = { 0 };
+
+    if (rm.isPtr) {
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
+
+        switch (rm.otype) {
+            case R_Bit16: { STACK16(temp, reg + disp); prev.x = *temp; regs[rm.oreg].x -= *temp; break; }
+            case R_Bit32: { STACK32(temp, reg + disp); prev.e = *temp; regs[rm.oreg].e -= *temp; break; }
+            case R_Bit64: { STACK64(temp, reg + disp); prev.r = *temp; regs[rm.oreg].r -= *temp; break; }
+            default: break;
+        }
+
+        ASM_rmPrint("SUB", &rm, disp, v_Reg, true);
+    } else {
+        switch (rm.otype) {
+            case R_Bit16: prev.x = regs[rm.areg].x; regs[rm.oreg].x -= regs[rm.areg].x; break;
+            case R_Bit32: prev.x = regs[rm.areg].e; regs[rm.oreg].e -= regs[rm.areg].e; regs[rm.oreg].eh = 0; break;
+            case R_Bit64: prev.x = regs[rm.areg].r; regs[rm.oreg].r -= regs[rm.areg].r; break;
+            default: break;
+        }
+        printf("SUB %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+    }
+
+    switch (rm.otype) {
+        case R_Bit16: res.x = prev.x - regs[rm.oreg].x; break;
+        case R_Bit32: res.e = prev.e - regs[rm.oreg].e; break;
+        case R_Bit64: res.r = prev.r - regs[rm.oreg].r; break;
+        default: break;
+    }
+
+    ASM_setFlags(&prev, &res, rm.otype, true);
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // 0x2F invalid
 
 // XOR r/m(16-64), r(16-64)
@@ -921,6 +962,14 @@ void _ASM_EB(uint8_t val) {
 // LOCK, maybe implement in the far future
 void ASM_F0(void) {
     lock = true;
+}
+
+void ASM_F2(void) {
+    doub = true;
+}
+
+void ASM_F3(void) {
+    sing = true;
 }
 
 #include "x86_F6.c"
