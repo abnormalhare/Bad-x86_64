@@ -349,7 +349,7 @@ void ASM_rexPrint(void) {
         printf(" %.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X\n",
                 stack[sp], stack[sp + 1], stack[sp + 2], stack[sp + 3], stack[sp + 4], stack[sp + 5], stack[sp + 6], stack[sp + 7]);
     
-    printf("  | BP:%.8X | 8:%.8X 9:%.8X 10:%.8X 11:%.8X | XMM1:%.8X%.8X%.8X%.8X |             :", regs[5].e, regs[8].e, regs[9].e, regs[10].e, regs[11].e, fregs[1].u[0], fregs[1].u[1], fregs[1].u[2], fregs[1].u[3]);
+    printf("  | BP:%.8X | 8:%.8X 9:%.8X 10:%.8X 11:%.8X | XMM1:%.8X%.8X%.8X%.8X |  F:%d%d%d%d%d%d%d%d :", regs[5].e, regs[8].e, regs[9].e, regs[10].e, regs[11].e, fregs[1].u[0], fregs[1].u[1], fregs[1].u[2], fregs[1].u[3], f.f.of, f.f.df, f.f.iF, f.f.sf, f.f.zf, f.f.af, f.f.pf, f.f.cf);
 
     sp = regs[4].e + 8;
     if (sp < 0x80000000)
