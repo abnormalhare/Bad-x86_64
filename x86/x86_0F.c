@@ -1,5 +1,72 @@
 #include "data.h"
 
+//    MOVUPS xmm, r/m(xmm128)
+// F3 MOVSS  xmm, r/m(xmm32)
+// 66 MOVUPD xmm, r/m(xmm128)
+// F2 MOVSD  xmm, r/m(xmm64)
+void ASM_0F_10(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Float128);
+    ASM_incIP(3, &rm);
+
+    u64 reg = 0;
+    rm.otype = R_Float128;
+    if (rm.isPtr) reg = ASM_getReg(rm.areg, rm.atype);
+    else          rm.atype = R_Float128;
+    
+    if (rm.disp == 1) data->disp = (s8)data->disp;
+
+    if (doub) { // MOVSD
+        if (rm.isPtr) {
+            STACK64F(temp, reg + data->disp);
+            fregs[rm.oreg].d[0] = *temp;
+            ASM_rmPrint("MOVSD", &rm, data->disp, v_Reg, true);
+        } else {
+            fregs[rm.oreg].d[0] = fregs[rm.areg].d[0];
+            printf("MOVSD %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+        }
+    } else if (oper) { // MOVUPD
+        if (rm.isPtr) {
+            STACK64F(temp, reg + data->disp);
+            STACK64F(temp2, reg + data->disp + 8);
+            fregs[rm.oreg].d[0] = *temp;
+            fregs[rm.oreg].d[1] = *temp2;
+
+            ASM_rmPrint("MOVUPD", &rm, data->disp, v_Reg, true);
+        } else {
+            fregs[rm.oreg].xi = fregs[rm.areg].xi;
+            printf("MOVUPD %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+        }
+    } else if (sing) { // MOVSS
+        if (rm.isPtr) {
+            STACK32F(temp, reg + data->disp);
+            fregs[rm.oreg].f[0] = *temp;
+            ASM_rmPrint("MOVSS", &rm, data->disp, v_Reg, true);
+        } else {
+            fregs[rm.oreg].f[0] = fregs[rm.areg].f[0];
+            printf("MOVSS %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+        }
+    } else { // MOVUPS
+        if (rm.isPtr) {
+            STACK32F(temp1, reg + data->disp + 0x0);
+            STACK32F(temp2, reg + data->disp + 0x4);
+            STACK32F(temp3, reg + data->disp + 0x8);
+            STACK32F(temp4, reg + data->disp + 0xC);
+            fregs[rm.oreg].f[0] = *temp1;
+            fregs[rm.oreg].f[1] = *temp2;
+            fregs[rm.oreg].f[2] = *temp3;
+            fregs[rm.oreg].f[3] = *temp4;
+
+            ASM_rmPrint("MOVUPS", &rm, data->disp, v_Reg, true);
+        } else {
+            fregs[rm.oreg].xi = fregs[rm.areg].xi;
+            printf("MOVUPS %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+        }
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 //    MOVUPS r/m(xmm128), xmm
 // F3 MOVSS  r/m(xmm32), xmm
 // 66 MOVUPD r/m(xmm128), xmm
@@ -681,7 +748,7 @@ void ASM_0F_B6(Data *data) {
 
 ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 0X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* 1X */ 0, ASM_0F_11, 0, 0, 0, 0, ASM_0F_16, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
+/* 1X */ ASM_0F_10, ASM_0F_11, 0, 0, 0, 0, ASM_0F_16, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
 /* 2X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_29, 0, 0, 0, 0, 0, 0, 
 /* 3X */ 0, ASM_0F_31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 4X */ 0, 0, 0, 0, 0, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
