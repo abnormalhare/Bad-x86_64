@@ -58,6 +58,8 @@ void ASM_E9(u32 val);
 void _ASM_EB(u8 val);
 #define ASM_EB(val, t) _ASM_EB(val); goto JMP_##t
 void ASM_F0(void);
+void ASM_F2(void);
+void ASM_F3(void);
 void ASM_F6(u8 rm, u8 sib, s32 disp, u8 val);
 void ASM_F7(u8 rm, u8 sib, s32 disp, u8 val);
 void ASM_FF(u8 rm, u8 sib, s32 disp);

@@ -454,13 +454,17 @@ void ASM_regPrint(void) {
             sprintf(buf, "%s\n", buf);
         }
     }
-    sprintf(buf, "%s\nrip: %.16llX  eflags: %.8X\n", buf, regs[16].r, f.i);
+    sprintf(buf, "%srip: %.16llX  eflags: %d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n", buf, regs[16].r, 
+        f.f.md, f.f.nt, f.f.io / 2, f.f.io % 2, f.f.of, f.f.df, f.f.iF, f.f.tf, f.f.sf, f.f.zf, f.f._reserved2, f.f.af, f.f._reserved1, f.f.pf, f.f.on, f.f.cf
+    );
+    sprintf(buf, "%s                               mn[]oditsz_a_p1c\n\n", buf);
+
     for (int i = 0; i < 16; i++) {
         if (i < 10)
             sprintf(buf, "%s%s:  %.16llX%.16llX  ", buf, ASM_getRegName(i, R_Float128), fregs[i].ul[0], fregs[i].ul[1]);
         else
             sprintf(buf, "%s%s: %.16llX%.16llX  ", buf, ASM_getRegName(i, R_Float128), fregs[i].ul[0], fregs[i].ul[1]);
-        if (i % 4 == 3) {
+        if (i % 2) {
             sprintf(buf, "%s\n", buf);
         }
     }

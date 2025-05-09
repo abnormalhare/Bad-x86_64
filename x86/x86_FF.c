@@ -1,6 +1,43 @@
 #include "data.h"
 
-void ASM_FFNOT(RM *rm, s32 disp) {
+void ASM_FFINC(RM *rm, s32 disp) {
+    Reg prev = { 0 };
+    Reg res = { 0 };
+
+    ASM_incIP(2, rm);
+
+    if (rm->isPtr) {
+        u64 reg = ASM_getReg(rm->areg, rm->atype);
+        if (rm->disp == 1) disp = (s8)disp;
+        
+        switch (rm->otype) {
+            case R_Bit16: { STACK16(temp, reg + disp); prev.x = (*temp)++; break; }
+            case R_Bit32: { STACK32(temp, reg + disp); prev.e = (*temp)++; break; }
+            case R_Bit64: { STACK64(temp, reg + disp); prev.r = (*temp)++; break; }
+            default: break;
+        }
+
+        ASM_rmPrint("INC", rm, disp, v_None, false);
+    } else {
+        switch (rm->otype) {
+            case R_Bit16: { prev.x = regs[rm->areg].x++; break; }
+            case R_Bit32: { prev.e = regs[rm->areg].e++; break; }
+            case R_Bit64: { prev.r = regs[rm->areg].r++; break; }
+            default: break;
+        }
+        printf("INC %s", ASM_getRegName(rm->areg, rm->atype));
+    }
+
+    res.l = prev.l + 1;
+
+    Flags s = { .f.df = f.f.df, .f.iF = f.f.iF, .f.cf = f.f.cf };
+    ASM_setFlags(&prev, &res, rm->otype, false);
+    f.f.df = s.f.df; f.f.iF = s.f.iF; f.f.cf = s.f.cf;
+
+    ASM_rexPrint();
+}
+
+void ASM_FFDEC(RM *rm, s32 disp) {
     Reg prev = { 0 };
     Reg res = { 0 };
 
@@ -120,6 +157,6 @@ void ASM_FFJMP(RM *rm, s32 disp) {
 }
 
 ASM_baseFunc ASM_FFFuncs[8] = {
-    0, ASM_FFNOT, ASM_FFCALL, 0,
+    ASM_FFINC, ASM_FFDEC, ASM_FFCALL, 0,
     ASM_FFJMP, 0, 0, 0,
 };

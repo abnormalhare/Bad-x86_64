@@ -874,6 +874,7 @@ void ASM_90(void) {
 
     printf("NOP");
     ASM_rexPrint();
+    ASM_end();
 }
 
 // 0x9A invalid
@@ -894,7 +895,7 @@ void ASM_BH(u8 in, u64 val) {
         ASM_rexPrint();
     } else {
         regs[r].e = val;
-        ASM_incIP(5, NULL);
+        ASM_incIP(6, NULL);
         printf("MOV %s, 0x%.8X", ASM_getRegName(r, R_Bit32), regs[r].e);
         ASM_rexPrint();
     }

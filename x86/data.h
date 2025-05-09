@@ -58,6 +58,7 @@ typedef union _mmx_reg {
 
 typedef struct _flag {
 // byte 0
+    u32 sf : 1;
     u32 zf : 1;
     u32 _reserved2 : 1;
     u32 af : 1;
@@ -68,12 +69,11 @@ typedef struct _flag {
 // byte 1
     u32 md : 1;
     u32 nt : 1;
-    u32 ol : 1;
+    u32 io : 2;
     u32 of : 1;
     u32 df : 1;
     u32 iF : 1;
     u32 tf : 1;
-    u32 sf : 1;
 // byte 2
     u32 _reserved4 : 2;
     u32 id : 1;

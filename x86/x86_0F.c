@@ -9,12 +9,9 @@ void ASM_0F_11(Data *data) {
     ASM_incIP(3, &rm);
 
     u64 reg = 0;
-    if (rm.isPtr) {
-        reg = ASM_getReg(rm.areg, rm.atype);
-    } else {
-        rm.atype = R_Float128;
-    }
     rm.otype = R_Float128;
+    if (rm.isPtr) reg = ASM_getReg(rm.areg, rm.atype);
+    else          rm.atype = R_Float128;
     
     if (rm.disp == 1) data->disp = (s8)data->disp;
 
@@ -104,8 +101,10 @@ void ASM_0F_16(Data *data) {
     ASM_end();
 }
 
+// NOP
 void ASM_0F_1F(Data *data) {
-    // NOP
+    ASM_rexPrint();
+    ASM_end();
 }
 
 void ASM_0F_29(Data *data) {
@@ -113,9 +112,9 @@ void ASM_0F_29(Data *data) {
     ASM_incIP(3, &rm);
 
     u64 reg = 0;
-    if (rm.isPtr) reg = ASM_getReg(rm.areg, rm.atype);
-    else rm.atype = R_Float128;
     rm.otype = R_Float128;
+    if (rm.isPtr) reg = ASM_getReg(rm.areg, rm.atype);
+    else          rm.atype = R_Float128;
 
     if (rm.disp == 1) data->disp = (s8)data->disp;
 
@@ -248,6 +247,58 @@ void ASM_0F_45(Data *data) {
     ASM_end();
 }
 
+void ASM_0F_57(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Float128);
+    ASM_incIP(3, &rm);
+
+    u64 reg = 0;
+    rm.otype = R_Float128;
+    if (rm.isPtr) reg = ASM_getReg(rm.areg, rm.atype);
+    else          rm.atype = R_Float128;
+    
+    if (rm.disp == 1) data->disp = (s8)data->disp;
+
+    if (rm.isPtr) {
+        if (!oper) {
+            STACK32(temp1, reg + data->disp + 0x0);
+            STACK32(temp2, reg + data->disp + 0x4);
+            STACK32(temp3, reg + data->disp + 0x8);
+            STACK32(temp4, reg + data->disp + 0xC);
+            *temp1 ^= fregs[rm.oreg].u[0];
+            *temp2 ^= fregs[rm.oreg].u[1];
+            *temp3 ^= fregs[rm.oreg].u[2];
+            *temp4 ^= fregs[rm.oreg].u[3];
+
+            ASM_rmPrint("XORPS", &rm, data->disp, v_Reg, false);
+        } else {
+            STACK64(temp1, reg + data->disp + 0x0);
+            STACK64(temp2, reg + data->disp + 0x8);
+            *temp1 ^= fregs[rm.oreg].ul[0];
+            *temp2 ^= fregs[rm.oreg].ul[1];
+
+            ASM_rmPrint("XORPD", &rm, data->disp, v_Reg, false);
+        }
+    } else {
+
+        if (!oper) {
+            __m128 a = _mm_castsi128_ps(fregs[rm.areg].xi);
+            __m128 b = _mm_castsi128_ps(fregs[rm.oreg].xi);
+            a = _mm_xor_ps(a, b);
+            fregs[rm.areg].xi = _mm_castps_si128(a);
+            printf("XORPS %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+        } else {
+            __m128d a = _mm_castsi128_pd(fregs[rm.areg].xi);
+            __m128d b = _mm_castsi128_pd(fregs[rm.oreg].xi);
+            a = _mm_xor_pd(a, b);
+            fregs[rm.areg].xi = _mm_castpd_si128(a);
+            printf("XORPD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+        }
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // MOVD mm/xmm, r/m(32) / MOVQ mm/xmm, r/m(64)
 void ASM_0F_6E(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_MMX);
@@ -308,6 +359,59 @@ void ASM_0F_6E(Data *data) {
             printf("MOVD %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
         } else {
             printf("MOVQ %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+        }
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
+// MOVQ r/m(mm), mm
+// MOVDQA r/m(xmm), xmm
+// MOVDQU r/m(xmm), xmm
+void ASM_0F_7F(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Float128);
+    ASM_incIP(3, &rm);
+
+    u64 reg = 0;
+    rm.otype = R_Float128;
+    if (rm.isPtr) reg = ASM_getReg(rm.areg, rm.atype);
+    else          rm.atype = R_Float128;
+    
+    if (rm.disp == 1) data->disp = (s8)data->disp;
+
+    if (sing) { // MOVDQU
+        if (rm.isPtr) {
+            STACK64F(temp, reg + data->disp);
+            *temp = fregs[rm.oreg].d[0];
+            ASM_rmPrint("MOVDQU", &rm, data->disp, v_Reg, false);
+        } else {
+            fregs[rm.areg].d[0] = fregs[rm.oreg].d[0];
+            printf("MOVDQU %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+        }
+    } else if (oper) { // MOVDQA
+        if ((reg + data->disp) / 4 * 4 != reg + data->disp) {
+            printf("GENERAL PROTECTION FAULT: %.8X", (u32)reg + data->disp);
+            exit(EXIT_FAILURE);
+        }
+        if (rm.isPtr) {
+            STACK64F(temp, reg + data->disp);
+            *temp = fregs[rm.oreg].d[0];
+            ASM_rmPrint("MOVDQA", &rm, data->disp, v_Reg, false);
+        } else {
+            fregs[rm.areg].d[0] = fregs[rm.oreg].d[0];
+            printf("MOVDQA %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+        }
+    } else { // MOVQ
+        rm.otype = R_MMX;
+        if (rm.isPtr) {
+            STACK64(temp, reg + data->disp);
+            *temp = xregs[rm.oreg].u;
+            ASM_rmPrint("MOVQ", &rm, data->disp, v_Reg, false);
+        } else {
+            rm.atype = R_MMX;
+            xregs[rm.areg].u = xregs[rm.oreg].u;
+            printf("MOVQ %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         }
     }
 
@@ -581,9 +685,9 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 2X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_29, 0, 0, 0, 0, 0, 0, 
 /* 3X */ 0, ASM_0F_31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 4X */ 0, 0, 0, 0, 0, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* 5X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* 5X */ 0, 0, 0, 0, 0, 0, 0, ASM_0F_57, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 6X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_6E, 0, 
-/* 7X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* 7X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_7F, 
 /* 8X */ 0, 0, 0, ASM_0F_83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 9X */ 0, 0, 0, 0, 0, ASM_0F_95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* AX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_AF, 
