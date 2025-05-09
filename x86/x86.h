@@ -5,6 +5,7 @@
 
 void ASM_01(u8 rm_code, u8 sib, s32 disp);
 void ASM_03(u8 rm_code, u8 sib, s32 disp);
+void ASM_0B(u8 rm_code, u8 sib, s32 disp);
 
 void ASM_0F(u8 index, Data* data);
 bool ASM_0F_85(Data *data);
@@ -43,6 +44,7 @@ void ASM_83(u8 rm, u8 sib, s32 disp, u8 val);
 void ASM_85(u8 rm_code, u8 sib, s32 disp);
 void ASM_88(u8 rm_code, u8 sib, s32 disp);
 void ASM_89(u8 rm_code, u8 sib, s32 disp);
+void ASM_8A(u8 rm_code, u8 sib, s32 disp);
 void ASM_8B(u8 rm_code, u8 sib, s32 disp);
 void ASM_8D(u8 rm_code, u8 sib, s32 disp);
 void ASM_90(void);

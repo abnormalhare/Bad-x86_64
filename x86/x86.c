@@ -84,6 +84,48 @@ void ASM_03(u8 rm_code, u8 sib, s32 disp) {
 
 // 0x06-07 invalid
 
+// OR r(16-64), r/m(16-64)
+void ASM_0B(u8 rm_code, u8 sib, s32 disp) {
+    RM rm = ASM_getRM(rm_code, sib, R_Bit32);
+    ASM_incIP(2, &rm);
+
+    Reg prev = { 0 };
+    Reg res = { 0 };
+
+    if (rm.isPtr) {
+        u64 reg = ASM_getReg(rm.areg, rm.atype);
+
+        switch (rm.otype) {
+            case R_Bit16: { STACK16(temp, reg + disp); prev.x = *temp; regs[rm.oreg].x |= *temp; break; }
+            case R_Bit32: { STACK32(temp, reg + disp); prev.e = *temp; regs[rm.oreg].e |= *temp; break; }
+            case R_Bit64: { STACK64(temp, reg + disp); prev.r = *temp; regs[rm.oreg].r |= *temp; break; }
+            default: break;
+        }
+
+        ASM_rmPrint("OR", &rm, disp, v_Reg, true);
+    } else {
+        switch (rm.otype) {
+            case R_Bit16: prev.x = regs[rm.areg].x; regs[rm.oreg].x |= regs[rm.areg].x; break;
+            case R_Bit32: prev.x = regs[rm.areg].e; regs[rm.oreg].e |= regs[rm.areg].e; regs[rm.oreg].eh = 0; break;
+            case R_Bit64: prev.x = regs[rm.areg].r; regs[rm.oreg].r |= regs[rm.areg].r; break;
+            default: break;
+        }
+        printf("OR %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+    }
+
+    switch (rm.otype) {
+        case R_Bit16: res.x = prev.x | regs[rm.oreg].x; break;
+        case R_Bit32: res.e = prev.e | regs[rm.oreg].e; break;
+        case R_Bit64: res.r = prev.r | regs[rm.oreg].r; break;
+        default: break;
+    }
+
+    ASM_setFlags(&prev, &res, rm.otype, false);
+    f.f.cf = 0; f.f.of = 0;
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // 0x0E invalid
 
 #include "x86_0F.c"
@@ -140,11 +182,9 @@ void ASM_23(u8 rm_code, u8 sib, s32 disp) {
     }
 
     u8 fa = f.f.af;
-    u8 fc = f.f.cf;
     ASM_setFlags(&prev, &res, rm.otype, false);
     f.f.af = fa;
-    f.f.cf = fc;
-    f.f.of = 0;
+    f.f.cf = 0; f.f.of = 0;
 
     ASM_rexPrint();
     ASM_end();
@@ -743,6 +783,34 @@ void ASM_89(u8 rm_code, u8 sib, s32 disp) {
     ASM_end();
 }
 
+// MOV r(8), r/m(8)
+void ASM_8A(u8 rm_code, u8 sib, s32 disp) {
+    RM rm = ASM_getRM(rm_code, sib, R_Bit8);
+    ASM_incIP(2, &rm);
+
+    if (rm.isPtr) {
+        STACK8(temp, regs[rm.areg].e + disp);
+        if (rm.otype == R_Bit8H) {
+            regs[rm.oreg].h = *temp;
+        } else {
+            regs[rm.oreg].l = *temp;
+        }
+
+        ASM_rmPrint("MOV", &rm, disp, v_Reg, true);
+    } else {
+        if (rm.otype == R_Bit8H) {
+            regs[rm.oreg].h = (rm.atype == R_Bit8H) ? regs[rm.areg].h : regs[rm.areg].l;
+        } else {
+            regs[rm.oreg].l = (rm.atype == R_Bit8H) ? regs[rm.areg].h : regs[rm.areg].l;
+        }
+        
+        printf("MOV %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // MOV r(16-64), r/m(16-64)
 void ASM_8B(u8 rm_code, u8 sib, s32 disp) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
@@ -892,6 +960,8 @@ void ASM_C7(u8 rm_code, u8 sib, s32 disp, u32 val) {
 void ASM_D1(u8 rm, u8 sib, s32 disp) {
     RegType type;
     RM ret = ASM_getRM(rm, sib, R_Bit32);
+
+    ASM_incIP(2, &ret);
 
     if (ASM_D1Funcs[ret.reg] == 0) {
         printf("UNIMPLEMENTED OPCODE: D1 %X", ret.reg);

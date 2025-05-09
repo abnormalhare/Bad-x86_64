@@ -156,6 +156,20 @@ void ASM_0F_29(Data *data) {
     ASM_end();
 }
 
+void ASM_0F_31(Data *data) {
+    ASM_incIP(2, NULL);
+
+    Reg temp;
+    temp.r = __rdtsc();
+
+    regs[2].e = temp.eh; regs[2].eh = 0;
+    regs[0].e = temp.e;  regs[0].eh = 0;
+
+    printf("RDTSC");
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // CMOVZ r(16-64), r/m(16-64)
 void ASM_0F_44(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
@@ -565,7 +579,7 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 0X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 1X */ 0, ASM_0F_11, 0, 0, 0, 0, ASM_0F_16, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
 /* 2X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_29, 0, 0, 0, 0, 0, 0, 
-/* 3X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* 3X */ 0, ASM_0F_31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 4X */ 0, 0, 0, 0, 0, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 5X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 6X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_6E, 0, 
