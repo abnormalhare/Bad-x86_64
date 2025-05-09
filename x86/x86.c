@@ -928,7 +928,7 @@ void ASM_C3(void) {
 // MOV r/m(8), imm(8)
 void ASM_C6(u8 rm_code, u8 sib, s32 disp, u8 val) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit8);
-    ASM_incIP(2, &rm);
+    ASM_incIP(3, &rm);
 
     if (rm.isPtr) {
         STACK8(temp, regs[rm.areg].e + disp);
