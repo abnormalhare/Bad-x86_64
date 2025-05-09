@@ -1,5 +1,27 @@
 #include "data.h"
 
+void ASM_FFNOT(RM *rm, s32 disp) {
+    if (rm->isPtr) {
+        u64 reg = ASM_getReg(rm->areg, rm->atype);
+        if (rm->disp == 1) disp = (s8)disp;
+        
+        STACK8(temp, reg + disp);
+        (*temp)--;
+
+        ASM_rmPrint("NOT", rm, disp, v_None, false);
+    } else {
+        switch (rm->otype) {
+            case R_Bit8:  regs[rm->areg].l--; break;
+            case R_Bit8H: regs[rm->areg].h--; break;
+            default: break;
+        }
+        printf("NOT %s", ASM_getRegName(rm->areg, rm->atype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 void ASM_FFCALL(RM *rm, s32 disp) {
     ASM_codeFunc func;
     u8 s;
@@ -83,6 +105,6 @@ void ASM_FFJMP(RM *rm, s32 disp) {
 }
 
 ASM_baseFunc ASM_FFFuncs[8] = {
-    0, 0, ASM_FFCALL, 0,
+    0, ASM_FFNOT, ASM_FFCALL, 0,
     ASM_FFJMP, 0, 0, 0,
 };
