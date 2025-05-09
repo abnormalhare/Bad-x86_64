@@ -50,6 +50,7 @@ void ASM_BH(u8 in, u64 val);
 void ASM_C1(u8 rm, u8 sib, s32 disp, u8 val);
 void ASM_C3(void);
 void ASM_C7(u8 rm_code, u8 sib, s32 disp, u32 val);
+void ASM_D1(u8 rm, u8 sib, s32 disp);
 void ASM_E8(u32 val);
 void ASM_E9(u32 val);
 void _ASM_EB(u8 val);

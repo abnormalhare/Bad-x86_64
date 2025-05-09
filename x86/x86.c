@@ -888,6 +888,20 @@ void ASM_C7(u8 rm_code, u8 sib, s32 disp, u32 val) {
     ASM_end();
 }
 
+#include "x86_D1.c"
+void ASM_D1(u8 rm, u8 sib, s32 disp) {
+    RegType type;
+    RM ret = ASM_getRM(rm, sib, R_Bit32);
+
+    if (ASM_D1Funcs[ret.reg] == 0) {
+        printf("UNIMPLEMENTED OPCODE: D1 %X", ret.reg);
+        exit(EXIT_FAILURE);
+    }
+    ASM_D1Funcs[ret.reg](&ret, disp);
+
+    ASM_end();
+}
+
 // 0xD4-D6 invalid
 
 // CALL rel(16/32)
