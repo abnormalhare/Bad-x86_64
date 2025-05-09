@@ -925,6 +925,32 @@ void ASM_C3(void) {
 
 // 0xC4-C5 invalid
 
+// MOV r/m(8), imm(8)
+void ASM_C6(u8 rm_code, u8 sib, s32 disp, u8 val) {
+    RM rm = ASM_getRM(rm_code, sib, R_Bit8);
+    ASM_incIP(2, &rm);
+
+    if (rm.isPtr) {
+        STACK8(temp, regs[rm.areg].e + disp);
+        *temp = val;
+
+        rm.val = val;
+        rm.valtype = R_Bit8;
+        ASM_rmPrint("MOV", &rm, disp, v_Val, false);
+    } else {
+        if (rm.atype == R_Bit8H) {
+            regs[rm.areg].h = val;
+        } else {
+            regs[rm.areg].l = val;
+        }
+        
+        printf("MOV %s, %.2X", ASM_getRegName(rm.areg, rm.atype), val);
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // MOV r/m(16-64), imm(16/32)
 void ASM_C7(u8 rm_code, u8 sib, s32 disp, u32 val) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);
@@ -941,7 +967,7 @@ void ASM_C7(u8 rm_code, u8 sib, s32 disp, u32 val) {
         }
 
         rm.val = val;
-        rm.valType = (rm.otype == R_Bit16) ? R_Bit16 : R_Bit32;
+        rm.valtype = (rm.otype == R_Bit16) ? R_Bit16 : R_Bit32;
         ASM_rmPrint("MOV", &rm, disp, v_Val, false);
     } else {
         switch (rm.otype) {

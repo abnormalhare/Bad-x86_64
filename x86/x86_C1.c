@@ -16,7 +16,7 @@ void ASM_C1SHL(RM *rm, s32 disp, u8 val) {
         }
 
         rm->val = val;
-        rm->valType = R_Bit8;
+        rm->valtype = R_Bit8;
         ASM_rmPrint("SHL", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
@@ -64,7 +64,7 @@ void ASM_C1SHR(RM *rm, s32 disp, u8 val) {
         }
 
         rm->val = val;
-        rm->valType = R_Bit8;
+        rm->valtype = R_Bit8;
         ASM_rmPrint("SHR", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {

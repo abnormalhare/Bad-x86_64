@@ -15,7 +15,7 @@ void ASM_F6TEST(RM *rm, s32 disp, u8 val) {
         prev.l = *temp;
 
         rm->val = val;
-        rm->valType = R_Bit8;
+        rm->valtype = R_Bit8;
         ASM_rmPrint("TEST", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {

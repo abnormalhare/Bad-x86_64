@@ -134,7 +134,7 @@ typedef struct _rm {
     RegType ptrtype; // otype unless sign ext
 
     u32 val; // if oreg isnt used
-    RegType valType;
+    RegType valtype;
 
     // data
     u8 bmul;

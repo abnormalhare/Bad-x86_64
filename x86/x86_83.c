@@ -16,7 +16,7 @@ void ASM_83ADD(RM *rm, s32 disp, u8 val) {
         }
 
         rm->val = val;
-        rm->valType = R_Bit8;
+        rm->valtype = R_Bit8;
         ASM_rmPrint("ADD", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
@@ -62,7 +62,7 @@ void ASM_83OR(RM *rm, s32 disp, u8 val) {
         }
 
         rm->val = val;
-        rm->valType = R_Bit8;
+        rm->valtype = R_Bit8;
         ASM_rmPrint("OR", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
@@ -116,7 +116,7 @@ void ASM_83AND(RM *rm, s32 disp, u8 val) {
         }
 
         rm->val = sval;
-        rm->valType = R_Bit8;
+        rm->valtype = R_Bit8;
         ASM_rmPrint("AND", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
@@ -168,7 +168,7 @@ void ASM_83SUB(RM *rm, s32 disp, u8 val) {
         }
 
         rm->val = val;
-        rm->valType = R_Bit8;
+        rm->valtype = R_Bit8;
         ASM_rmPrint("SUB", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
@@ -216,7 +216,7 @@ void ASM_83CMP(RM *rm, s32 disp, u8 val) {
         }
 
         rm->val = val;
-        rm->valType = R_Bit8;
+        rm->valtype = R_Bit8;
         ASM_rmPrint("CMP", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {

@@ -11,7 +11,7 @@ void ASM_D1SHR(RM *rm, s32 disp) {
         STACK8(temp, reg + disp); prev.l = *temp; *temp >>= 1;
 
         rm->val = 1;
-        rm->valType = R_Bit8;
+        rm->valtype = R_Bit8;
         ASM_rmPrint("SHR", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {

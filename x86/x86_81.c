@@ -16,7 +16,7 @@ void ASM_81ADD(RM *rm, s32 disp, u32 val) {
         }
 
         rm->val = val;
-        rm->valType = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
+        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
         ASM_rmPrint("ADD", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
@@ -66,7 +66,7 @@ void ASM_81AND(RM *rm, s32 disp, u32 val) {
         }
 
         rm->val = val;
-        rm->valType = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
+        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
         ASM_rmPrint("AND", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
@@ -122,7 +122,7 @@ void ASM_81SUB(RM *rm, s32 disp, u32 val) {
         }
 
         rm->val = val;
-        rm->valType = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
+        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
         ASM_rmPrint("SUB", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
@@ -172,7 +172,7 @@ void ASM_81CMP(RM *rm, s32 disp, u32 val) {
         }
 
         rm->val = val;
-        rm->valType = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
+        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
         ASM_rmPrint("CMP", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {

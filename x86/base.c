@@ -117,7 +117,7 @@ RM ASM_getRM(u8 rm, u8 sib, RegType type) {
     }
 
     ret.ptrtype = ret.otype;
-    ret.valType = REG_NULL;
+    ret.valtype = REG_NULL;
 
     return ret;
 }
@@ -169,13 +169,15 @@ void ASM_incIP(u32 num, RM *rm) {
         return;
     }
     regs[16].e += num + rm->disp;
-    if (rm->isSib)       regs[16].e += 1;
-    if (rex.enable != 0) regs[16].e += 1;
-    if (addr != 0)       regs[16].e += 1;
-    if (oper != 0)       regs[16].e += 1;
-    if (fs != 0)         regs[16].e += 1;
-    if (gs != 0)         regs[16].e += 1;
-    if (lock != 0)       regs[16].e += 1;
+    if (rm->isSib)       regs[16].e++;
+    if (rex.enable != 0) regs[16].e++;
+    if (addr != 0)       regs[16].e++;
+    if (oper != 0)       regs[16].e++;
+    if (sing != 0)       regs[16].e++;
+    if (doub != 0)       regs[16].e++;
+    if (fs != 0)         regs[16].e++;
+    if (gs != 0)         regs[16].e++;
+    if (lock != 0)       regs[16].e++;
 }
 
 bool ASM_getParity(u8 num) {
@@ -428,7 +430,7 @@ void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip) {
     if (val == v_Reg && !flip) {
         sprintf_s(buf, 256, "%s], %s", buf, ASM_getRegName(rm->oreg, rm->otype));
     } else if (val == v_Val && !flip) {
-        switch (rm->valType) {
+        switch (rm->valtype) {
             case R_Bit8:  sprintf_s(buf, 256, "%s], 0x%.2X",  buf, rm->val); break;
             case R_Bit16: sprintf_s(buf, 256, "%s], 0x%.4X",  buf, rm->val); break;
             case R_Bit32: sprintf_s(buf, 256, "%s], 0x%.8X",  buf, rm->val); break;
