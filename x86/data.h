@@ -156,6 +156,7 @@ typedef struct _data {
     s32 disp;
     RegType regType;
     RegType valType;
+    bool call;
 } Data;
 
 typedef void (*ASM_codeFunc)(void);

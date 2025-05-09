@@ -8,8 +8,11 @@ void ASM_03(u8 rm_code, u8 sib, s32 disp);
 void ASM_0B(u8 rm_code, u8 sib, s32 disp);
 
 void ASM_0F(u8 index, Data* data);
-bool ASM_0F_85(Data *data);
-#define ASM_0F_I(ix, data, t) if (ASM_0F_## ix (data)) goto JMP_##t; ASM_end()
+bool _ASM_0F_82(Data *data);
+bool _ASM_0F_83(Data *data);
+bool _ASM_0F_84(Data *data);
+bool _ASM_0F_85(Data *data);
+#define ASM_0F_J(ix, data, t) if (_ASM_0F_## ix (data)) goto JMP_##t; ASM_end()
 
 void ASM_23(u8 rm_code, u8 sib, s32 disp);
 void ASM_2B(u8 rm_code, u8 sib, s32 disp);

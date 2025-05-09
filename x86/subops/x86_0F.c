@@ -486,48 +486,115 @@ void ASM_0F_7F(Data *data) {
     ASM_end();
 }
 
-// JNB long
-void ASM_0F_83(Data *data) {
+// JB long
+bool _ASM_0F_82(Data *data) {
     Reg conv = { .e = data->val };
     ASM_incIP(IS_OP(6, 4), NULL);
 
-    if (!oper) {
-        printf("JNB 0x%.4X", conv.e);
-    } else {
-        printf("JNB 0x%.2X", conv.l);
-    }
+    if (!oper)  printf("JB 0x%.4X", conv.e);
+    else        printf("JB 0x%.2X", conv.x);
     
-    if (f.f.cf) { // if carry, dont jump
+    if (!f.f.cf) { // if not carry, dont jump
         ASM_rexPrint();
         ASM_end();
-        return;
+        return false;
     }
 
-    if (!oper) {
-        regs[16].x += conv.e;
-    } else {
-        regs[16].e += conv.l;
-    }
+    if (!oper)  regs[16].e += conv.e;
+    else        regs[16].x += conv.x;
+    
     printf(" -> PASSED");
-
 
     ASM_rexPrint();
     ASM_end();
 
-    ASM_codeFunc func = ASM_getCurrFunc();
-    func();
+    if (data->call) {
+        ASM_codeFunc func = ASM_getCurrFunc();
+        func();
+    } else {
+        return true;
+    }
 }
 
-// JZ long
-bool ASM_0F_85(Data *data) {
+void ASM_0F_82(Data *data) {
+    _ASM_0F_82(data);
+}
+
+// JNB long
+bool _ASM_0F_83(Data *data) {
     Reg conv = { .e = data->val };
     ASM_incIP(IS_OP(6, 4), NULL);
 
-    if (!oper) {
-        printf("JNZ 0x%.4X", conv.e);
-    } else {
-        printf("JNZ 0x%.2X", conv.l);
+    if (!oper)  printf("JNB 0x%.4X", conv.e);
+    else        printf("JNB 0x%.2X", conv.x);
+    
+    if (f.f.cf) { // if carry, dont jump
+        ASM_rexPrint();
+        ASM_end();
+        return false;
     }
+
+    if (!oper)  regs[16].e += conv.e;
+    else        regs[16].x += conv.x;
+    
+    printf(" -> PASSED");
+
+    ASM_rexPrint();
+    ASM_end();
+
+    if (data->call) {
+        ASM_codeFunc func = ASM_getCurrFunc();
+        func();
+    } else {
+        return true;
+    }
+}
+
+void ASM_0F_83(Data *data) {
+    _ASM_0F_83(data);
+}
+
+// JZ long
+bool _ASM_0F_84(Data *data) {
+    Reg conv = { .e = data->val };
+    ASM_incIP(IS_OP(6, 4), NULL);
+
+    if (!oper)  printf("JZ 0x%.4X", conv.e);
+    else        printf("JZ 0x%.2X", conv.x);
+    
+    if (!f.f.zf) { // if not zero, dont jump
+        ASM_rexPrint();
+        ASM_end();
+        return false;
+    }
+
+    if (!oper)  regs[16].e += conv.e;
+    else        regs[16].x += conv.x;
+    
+    printf(" -> PASSED");
+
+    ASM_rexPrint();
+    ASM_end();
+    
+    if (data->call) {
+        ASM_codeFunc func = ASM_getCurrFunc();
+        func();
+    } else {
+        return true;
+    }
+}
+
+void ASM_0F_84(Data *data) {
+    _ASM_0F_84(data);
+}
+
+// JNZ long
+bool _ASM_0F_85(Data *data) {
+    Reg conv = { .e = data->val };
+    ASM_incIP(IS_OP(6, 4), NULL);
+
+    if (!oper)  printf("JNZ 0x%.4X", conv.e);
+    else        printf("JNZ 0x%.2X", conv.x);
     
     if (f.f.zf) { // if it is zero, dont jump
         ASM_rexPrint();
@@ -535,16 +602,24 @@ bool ASM_0F_85(Data *data) {
         return false;
     }
 
-    if (!oper) {
-        regs[16].x += conv.e;
-    } else {
-        regs[16].e += conv.l;
-    }
+    if (!oper)  regs[16].e += conv.e;
+    else        regs[16].x += conv.x;
+    
     printf(" -> PASSED");
 
     ASM_rexPrint();
     ASM_end();
-    return true;
+    
+    if (data->call) {
+        ASM_codeFunc func = ASM_getCurrFunc();
+        func();
+    } else {
+        return true;
+    }
+}
+
+void ASM_0F_85(Data *data) {
+    _ASM_0F_85(data);
 }
 
 void ASM_0F_95(Data *data) {
@@ -755,7 +830,7 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 5X */ 0, 0, 0, 0, 0, 0, 0, ASM_0F_57, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 6X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_6E, 0, 
 /* 7X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_7F, 
-/* 8X */ 0, 0, 0, ASM_0F_83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* 8X */ 0, 0, 0, ASM_0F_83, ASM_0F_84, ASM_0F_85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 9X */ 0, 0, 0, 0, 0, ASM_0F_95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* AX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_AF, 
 /* BX */ 0, ASM_0F_B1, 0, 0, 0, 0, ASM_0F_B6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
