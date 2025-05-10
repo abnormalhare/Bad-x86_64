@@ -1,5 +1,20 @@
 #include "../data.h"
 
+#include "x86_0F_01.c"
+void ASM_0F_01(Data *data) {
+    RM ret = ASM_getRM(data->rm_code, data->sib, R_Bit32);
+    data->rm = &ret;
+    ASM_incIP(3, &ret);
+
+    if (ASM_0F_01Funcs[ret.reg] == 0) {
+        printf("UNIMPLEMENTED OPCODE: 0F 01 /%X", ret.reg + 4);
+        exit(EXIT_FAILURE);
+    }
+    ASM_0F_01Funcs[ret.reg](data);
+
+    ASM_end();
+}
+
 //    MOVUPS xmm, r/m(xmm128)
 // F3 MOVSS  xmm, r/m(xmm32)
 // 66 MOVUPD xmm, r/m(xmm128)
@@ -891,34 +906,52 @@ void ASM_0F_B1(Data *data) {
     ASM_end();
 }
 
-// MOVZX r/m(16-64), r(8)
+// MOVZX r(16-64), r/m(8)
 void ASM_0F_B6(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
     ASM_incIP(3, &rm);
 
     RegType type = (rex.enable != 0 && rm.oreg >= 4 && rm.oreg < 8) ? R_Bit8H : R_Bit8;
-    u64 oreg = ASM_getReg(rm.oreg, type);
 
     if (rm.isPtr) {
         s64 fdisp = ASM_getDisp(&rm, data->disp);
 
-        switch (rm.otype) {
-            case R_Bit16: { STACK16(temp, fdisp); *temp = oreg; break; }
-            case R_Bit32: { STACK32(temp, fdisp); *temp = oreg; break; }
-            case R_Bit64: { STACK64(temp, fdisp); *temp = oreg; break; }
-            default: break;
+        if (type == R_Bit8) {
+            switch (rm.otype) {
+                case R_Bit16: { STACK16(temp, fdisp); regs[rm.oreg].l = *temp; break; }
+                case R_Bit32: { STACK32(temp, fdisp); regs[rm.oreg].l = *temp; break; }
+                case R_Bit64: { STACK64(temp, fdisp); regs[rm.oreg].l = *temp; break; }
+                default: break;
+            }
+        } else {
+            switch (rm.otype) {
+                case R_Bit16: { STACK16(temp, fdisp); regs[rm.oreg].h = *temp; break; }
+                case R_Bit32: { STACK32(temp, fdisp); regs[rm.oreg].h = *temp; break; }
+                case R_Bit64: { STACK64(temp, fdisp); regs[rm.oreg].h = *temp; break; }
+                default: break;
+            }
         }
 
-        rm.otype = type;
-        ASM_rmPrint("MOVZX", &rm, data->disp, v_Reg, false);
+        rm.atype = type;
+        ASM_rmPrint("MOVZX", &rm, data->disp, v_Reg, true);
     } else {
-        switch (rm.otype) {
-            case R_Bit16: regs[rm.areg].x = oreg; break;
-            case R_Bit32: regs[rm.areg].e = oreg; regs[rm.areg].eh = 0; break;
-            case R_Bit64: regs[rm.areg].r = oreg; break;
-            default: break;
+        if (type == R_Bit8) {
+            switch (rm.otype) {
+                case R_Bit16: regs[rm.oreg].l = regs[rm.areg].x; break;
+                case R_Bit32: regs[rm.oreg].l = regs[rm.areg].e; break;
+                case R_Bit64: regs[rm.oreg].l = regs[rm.areg].r; break;
+                default: break;
+            }
+        } else {
+            switch (rm.otype) {
+                case R_Bit16: regs[rm.oreg].h = regs[rm.areg].x; break;
+                case R_Bit32: regs[rm.oreg].h = regs[rm.areg].e; break;
+                case R_Bit64: regs[rm.oreg].h = regs[rm.areg].r; break;
+                default: break;
+            }
         }
-        printf("MOVZX %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, type));
+        
+        printf("MOVZX %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, type));
     }
 
     ASM_rexPrint();
@@ -947,11 +980,11 @@ void ASM_0F_BA(Data *data) {
 }
 
 ASM_dataFunc ASM_0FFuncs[0x100] = {
-/* 0X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* 0X */ 0, ASM_0F_01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 1X */ ASM_0F_10, ASM_0F_11, 0, 0, 0, 0, ASM_0F_16, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
 /* 2X */ 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_28, ASM_0F_29, 0, 0, 0, 0, 0, 0, 
 /* 3X */ 0, ASM_0F_31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* 4X */ 0, 0, 0, 0, 0, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* 4X */ 0, 0, 0, 0, ASM_0F_44, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 5X */ 0, 0, 0, 0, 0, 0, 0, ASM_0F_57, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 6X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_6E, 0, 
 /* 7X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_7F, 

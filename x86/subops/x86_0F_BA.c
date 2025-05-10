@@ -21,7 +21,7 @@ void ASM_0F_BABT(RM *rm, s32 disp, u8 val) {
             case R_Bit64: f.f.cf = ((regs[rm->areg].r & (1 << val)) == (1 << val)); break;
             default: break;
         }
-        printf("BT %s, %.2X", ASM_getRegName(rm->areg, rm->atype), val);
+        printf("BT %s, 0x%.2X", ASM_getRegName(rm->areg, rm->atype), val);
     }
 
     f.f.of = 0; f.f.sf = 0; f.f.zf = 0; f.f.af = 0; f.f.pf = 0;

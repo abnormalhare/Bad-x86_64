@@ -108,11 +108,16 @@ RM ASM_getRM(u8 rm, u8 sib, RegType type) {
         case 1: ret.disp = 1; break;
         case 2: ret.disp = 4; break;
         case 3:
-            ret.atype = ret.otype;
             ret.isPtr = false;
-            if (ret.areg >= 4 && ret.areg < 8 && ret.otype == R_Bit8) {
-                ret.areg -= 4;
-                ret.atype = R_Bit8H;
+            if (type == R_Bit8 || type == R_Bit8H) {
+                if (ret.areg >= 4 && ret.areg < 8) {
+                    ret.areg -= 4;
+                    ret.atype = R_Bit8H;
+                } else {
+                    ret.atype = R_Bit8;
+                }
+            } else {
+                ret.atype = ret.otype;
             }
             break;
     }

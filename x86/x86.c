@@ -126,6 +126,23 @@ void ASM_0B(u8 rm_code, u8 sib, s32 disp) {
     ASM_end();
 }
 
+void ASM_0C(u8 val) {
+    ASM_incIP(2, NULL);
+
+    Reg prev = { .l = regs[0].l };
+    Reg res = { 0 };
+
+    regs[0].l |= val;
+    res.l = prev.l | val;
+
+    printf("OR al, 0x%.2X", val);
+    
+    ASM_setFlags(&prev, &res, R_Bit8, false);
+    f.f.cf = 0; f.f.of = 0;
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // 0x0E invalid
 
 #include "subops/x86_0F.c"
@@ -755,6 +772,20 @@ bool _ASM_7C(s8 val) {
     ASM_rexPrint();
     ASM_end();
     return true;
+}
+
+#include "subops/x86_80.c"
+void ASM_80(u8 rm, u8 sib, s32 disp, u8 val) {
+    RM ret = ASM_getRM(rm, sib, R_Bit8);
+    ASM_incIP(3, &ret);
+
+    if (ASM_80Funcs[ret.reg] == 0) {
+        printf("UNIMPLEMENTED OPCODE: 80 /%X", ret.reg);
+        exit(EXIT_FAILURE);
+    }
+    ASM_80Funcs[ret.reg](&ret, disp, val);
+
+    ASM_end();
 }
 
 #include "subops/x86_81.c"

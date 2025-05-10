@@ -154,6 +154,7 @@ typedef struct _data {
     u8 sib;
     u32 val;
     s32 disp;
+    RM *rm;
     RegType regType;
     RegType valType;
     bool call;

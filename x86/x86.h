@@ -6,6 +6,7 @@
 void ASM_01(u8 rm_code, u8 sib, s32 disp);
 void ASM_03(u8 rm_code, u8 sib, s32 disp);
 void ASM_0B(u8 rm_code, u8 sib, s32 disp);
+void ASM_0C(u8 val);
 
 void ASM_0F(u8 index, Data* data);
 bool _ASM_0F_82(Data *data);
@@ -47,6 +48,7 @@ bool _ASM_7C(s8 val);
 #define ASM_77(val, t) if (_ASM_77(val)) goto JMP_##t
 #define ASM_79(val, t) if (_ASM_79(val)) goto JMP_##t
 #define ASM_7C(val, t) if (_ASM_7C(val)) goto JMP_##t
+void ASM_80(u8 rm, u8 sib, s32 disp, u8 val);
 void ASM_81(u8 rm, u8 sib, s32 disp, u32 val);
 void ASM_83(u8 rm, u8 sib, s32 disp, u8 val);
 void ASM_85(u8 rm_code, u8 sib, s32 disp);
