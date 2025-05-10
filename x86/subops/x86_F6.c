@@ -1,4 +1,4 @@
-#include "data.h"
+#include "../data.h"
 
 
 
@@ -8,10 +8,9 @@ void ASM_F6TEST(RM *rm, s32 disp, u8 val) {
     Reg res = { 0 };
     
     if (rm->isPtr) {
-        u64 reg = ASM_getReg(rm->areg, rm->atype);
-        if (rm->disp == 1) disp = (s8)disp;
+        s64 fdisp = ASM_getDisp(rm, disp);
 
-        STACK8(temp, reg + disp);
+        STACK8(temp, fdisp);
         prev.l = *temp;
 
         rm->val = val;

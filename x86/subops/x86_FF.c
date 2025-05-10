@@ -1,4 +1,4 @@
-#include "data.h"
+#include "../data.h"
 
 void ASM_FFINC(RM *rm, s32 disp) {
     Reg prev = { 0 };
@@ -7,13 +7,12 @@ void ASM_FFINC(RM *rm, s32 disp) {
     ASM_incIP(2, rm);
 
     if (rm->isPtr) {
-        u64 reg = ASM_getReg(rm->areg, rm->atype);
-        if (rm->disp == 1) disp = (s8)disp;
+        s64 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->otype) {
-            case R_Bit16: { STACK16(temp, reg + disp); prev.x = (*temp)++; break; }
-            case R_Bit32: { STACK32(temp, reg + disp); prev.e = (*temp)++; break; }
-            case R_Bit64: { STACK64(temp, reg + disp); prev.r = (*temp)++; break; }
+            case R_Bit16: { STACK16(temp, fdisp); prev.x = (*temp)++; break; }
+            case R_Bit32: { STACK32(temp, fdisp); prev.e = (*temp)++; break; }
+            case R_Bit64: { STACK64(temp, fdisp); prev.r = (*temp)++; break; }
             default: break;
         }
 
@@ -44,13 +43,12 @@ void ASM_FFDEC(RM *rm, s32 disp) {
     ASM_incIP(2, rm);
 
     if (rm->isPtr) {
-        u64 reg = ASM_getReg(rm->areg, rm->atype);
-        if (rm->disp == 1) disp = (s8)disp;
+        s64 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->otype) {
-            case R_Bit16: { STACK16(temp, reg + disp); prev.x = (*temp)--; break; }
-            case R_Bit32: { STACK32(temp, reg + disp); prev.e = (*temp)--; break; }
-            case R_Bit64: { STACK64(temp, reg + disp); prev.r = (*temp)--; break; }
+            case R_Bit16: { STACK16(temp, fdisp); prev.x = (*temp)--; break; }
+            case R_Bit32: { STACK32(temp, fdisp); prev.e = (*temp)--; break; }
+            case R_Bit64: { STACK64(temp, fdisp); prev.r = (*temp)--; break; }
             default: break;
         }
 
@@ -82,17 +80,14 @@ void ASM_FFCALL(RM *rm, s32 disp) {
     regs[4].r -= 8;
     STACK64(temp, regs[4].e);
     *temp = regs[16].e;
-
-    u64 reg = ASM_getReg(rm->areg, rm->atype);
     
     if (rm->isPtr) {
-        if (rm->disp == 1) disp = (s8)disp;
-        if (rm->atype == R_Seg) { s = rm->areg; rm->areg = 16; }
+        s64 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->atype) {
-            case R_Bit16: { regs[16].x = reg + disp; break; }
-            case R_Bit32: { regs[16].e = reg + disp; break; }
-            case R_Bit64: { regs[16].r = reg + disp; break; }
+            case R_Bit16: { regs[16].x = fdisp; break; }
+            case R_Bit32: { regs[16].e = fdisp; break; }
+            case R_Bit64: { regs[16].r = fdisp; break; }
             default: break;
         }
 
@@ -122,17 +117,14 @@ void ASM_FFJMP(RM *rm, s32 disp) {
     u8 s;
 
     ASM_incIP(2, rm);
-
-    u64 reg = ASM_getReg(rm->areg, rm->atype);
     
     if (rm->isPtr) {
-        if (rm->disp == 1) disp = (s8)disp;
-        if (rm->atype == R_Seg) { s = rm->areg; rm->areg = 16; }
+        s64 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->atype) {
-            case R_Bit16: { regs[16].x = reg + disp; break; }
-            case R_Bit32: { regs[16].e = reg + disp; break; }
-            case R_Bit64: { regs[16].r = reg + disp; break; }
+            case R_Bit16: { regs[16].x = fdisp; break; }
+            case R_Bit32: { regs[16].e = fdisp; break; }
+            case R_Bit64: { regs[16].r = fdisp; break; }
             default: break;
         }
 

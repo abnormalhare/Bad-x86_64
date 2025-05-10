@@ -1,17 +1,16 @@
-#include "data.h"
+#include "../data.h"
 
 void ASM_C1SHL(RM *rm, s32 disp, u8 val) {
     Reg prev = { 0 };
     Reg res = { 0 };
     
     if (rm->isPtr) {
-        u64 reg = ASM_getReg(rm->areg, rm->atype);
-        if (rm->disp == 1) disp = (s8)disp;
+        s64 fdisp = ASM_getDisp(rm, disp);
 
         switch (rm->otype) {
-            case R_Bit16: { STACK16(temp, reg + disp); prev.x = *temp; *temp <<= val; break; }
-            case R_Bit32: { STACK32(temp, reg + disp); prev.e = *temp; *temp <<= val; break; }
-            case R_Bit64: { STACK64(temp, reg + disp); prev.r = *temp; *temp <<= val; break; }
+            case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; *temp <<= val; break; }
+            case R_Bit32: { STACK32(temp, fdisp); prev.e = *temp; *temp <<= val; break; }
+            case R_Bit64: { STACK64(temp, fdisp); prev.r = *temp; *temp <<= val; break; }
             default: break;
         }
 
@@ -53,13 +52,12 @@ void ASM_C1SHR(RM *rm, s32 disp, u8 val) {
     Reg res = { 0 };
     
     if (rm->isPtr) {
-        u64 reg = ASM_getReg(rm->areg, rm->atype);
-        if (rm->disp == 1) disp = (s8)disp;
+        s64 fdisp = ASM_getDisp(rm, disp);
 
         switch (rm->otype) {
-            case R_Bit16: { STACK16(temp, reg + disp); prev.x = *temp; *temp >>= val; break; }
-            case R_Bit32: { STACK32(temp, reg + disp); prev.e = *temp; *temp >>= val; break; }
-            case R_Bit64: { STACK64(temp, reg + disp); prev.r = *temp; *temp >>= val; break; }
+            case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; *temp >>= val; break; }
+            case R_Bit32: { STACK32(temp, fdisp); prev.e = *temp; *temp >>= val; break; }
+            case R_Bit64: { STACK64(temp, fdisp); prev.r = *temp; *temp >>= val; break; }
             default: break;
         }
 

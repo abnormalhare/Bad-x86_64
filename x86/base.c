@@ -48,7 +48,7 @@ void ASM_getSIB(RM *rm, u8 sib) {
     }
 
     rm->btype = IS_AD(R_Bit64, R_Bit32);
-    rm->bmul = 1 << ss;
+    rm->mul = 1 << ss;
 
     rm->areg = IS_X(ix, ix + 8);
     if (ix == 4 && rex.x == 0) rm->areg = REG_NULL;
@@ -71,6 +71,7 @@ RM ASM_getRM(u8 rm, u8 sib, RegType type) {
     ret.isPtr = true;
 
     ret.breg = REG_NULL;
+    ret.mul = 1;
 
     ret.oreg = IS_R(ret.reg, ret.reg + 8);
     switch (type) {
@@ -161,6 +162,20 @@ u64 ASM_getReg(u8 index, RegType type) {
     }
 
     return reg;
+}
+
+s64 ASM_getDisp(RM *rm, s32 disp) {
+    if (rm->disp == 1) disp = (s8)disp;
+
+    if (rm->areg == REG_NULL && rm->breg == REG_NULL) {
+        return disp;
+    } else if (rm->areg == REG_NULL) {
+        return ASM_getReg(rm->breg, rm->btype) + disp;
+    } else if (rm->breg == REG_NULL) {
+        return ASM_getReg(rm->areg, rm->atype) * rm->mul + disp;
+    } else {
+        return ASM_getReg(rm->areg, rm->atype) * rm->mul + rm->breg + disp;
+    }
 }
 
 void ASM_incIP(u32 num, RM *rm) {
@@ -350,6 +365,7 @@ void ASM_rexPrint(void) {
     if (sp < 0x80000000)
         printf(" %.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X\n",
                 stack[sp], stack[sp + 1], stack[sp + 2], stack[sp + 3], stack[sp + 4], stack[sp + 5], stack[sp + 6], stack[sp + 7]);
+    else printf("\n");
     
     printf("  |BP:%.8X|8:%.16llX 9:%.16llX 10:%.16llX 11:%.16llX|XMM0H:%.8X%.8X| F:%d%d%d%d%d%d%d%d :", regs[5].e, regs[8].r, regs[9].r, regs[10].r, regs[11].r, fregs[1].u[0], fregs[1].u[1], f.f.of, f.f.df, f.f.iF, f.f.sf, f.f.zf, f.f.af, f.f.pf, f.f.cf);
 
@@ -357,6 +373,7 @@ void ASM_rexPrint(void) {
     if (sp < 0x80000000)
         printf(" %.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X\n",
                 stack[sp], stack[sp + 1], stack[sp + 2], stack[sp + 3], stack[sp + 4], stack[sp + 5], stack[sp + 6], stack[sp + 7]);
+    else printf("\n");
 }
 
 bool ASM_sign = false;
@@ -398,7 +415,7 @@ void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip) {
         printf_s(buf);
         return;
     } else if (rm->isSib && rm->breg != REG_NULL && rm->areg != REG_NULL) {
-        sprintf_s(buf, 256, "%s%s [%s+%s*%d", buf, ASM_ptrName(rm->ptrtype), ASM_getRegName(rm->breg, rm->btype), ASM_getRegName(rm->areg, rm->atype), rm->bmul);
+        sprintf_s(buf, 256, "%s%s [%s+%s*%d", buf, ASM_ptrName(rm->ptrtype), ASM_getRegName(rm->breg, rm->btype), ASM_getRegName(rm->areg, rm->atype), rm->mul);
 
         if      (rm->disp == 1) sprintf_s(buf, 256, "%s %c %#.2X", buf, ASM_S(), sDisp);
         else if (rm->disp == 4) sprintf_s(buf, 256, "%s %c %#.8X", buf, ASM_S(), disp);
@@ -408,7 +425,7 @@ void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip) {
         if      (rm->disp == 1) sprintf_s(buf, 256, "%s%c%#.2X", buf, ASM_S(), sDisp);
         else if (rm->disp == 4) sprintf_s(buf, 256, "%s%c%#.8X", buf, ASM_S(), disp);
     } else if (rm->isSib && rm->breg == REG_NULL) {
-        sprintf_s(buf, 256, "%s%s [%s*%d", buf, ASM_ptrName(rm->ptrtype), ASM_getRegName(rm->areg, rm->atype), rm->bmul);
+        sprintf_s(buf, 256, "%s%s [%s*%d", buf, ASM_ptrName(rm->ptrtype), ASM_getRegName(rm->areg, rm->atype), rm->mul);
 
         if      (rm->disp == 1) sprintf_s(buf, 256, "%s %c %#.2X", buf, ASM_S(), sDisp);
         else if (rm->disp == 4) sprintf_s(buf, 256, "%s %c %#.8X", buf, ASM_S(), disp);

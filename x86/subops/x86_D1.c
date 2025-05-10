@@ -1,14 +1,13 @@
-#include "data.h"
+#include "../data.h"
 
 void ASM_D1SHR(RM *rm, s32 disp) {
     Reg prev = { 0 };
     Reg res = { 0 };
     
     if (rm->isPtr) {
-        u64 reg = ASM_getReg(rm->areg, rm->atype);
-        if (rm->disp == 1) disp = (s8)disp;
+        s64 fdisp = ASM_getDisp(rm, disp);
 
-        STACK8(temp, reg + disp); prev.l = *temp; *temp >>= 1;
+        STACK8(temp, fdisp); prev.l = *temp; *temp >>= 1;
 
         rm->val = 1;
         rm->valtype = R_Bit8;
