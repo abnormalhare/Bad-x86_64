@@ -131,7 +131,7 @@ void ASM_0B(u8 rm_code, u8 sib, s32 disp) {
 #include "subops/x86_0F.c"
 void ASM_0F(u8 index, Data *data) {
     if (ASM_0FFuncs[index] == 0) {
-        printf("UNIMPLEMENTED OPCODE: %X", index);
+        printf("UNIMPLEMENTED OPCODE: 0F %X", index);
         exit(EXIT_FAILURE);
     }
 
@@ -763,7 +763,7 @@ void ASM_81(u8 rm, u8 sib, s32 disp, u32 val) {
     ASM_incIP(IS_OP(6, 4), &ret);
 
     if (ASM_81Funcs[ret.reg] == 0) {
-        printf("UNIMPLEMENTED OPCODE: 81 %X", ret.reg);
+        printf("UNIMPLEMENTED OPCODE: 81 /%X", ret.reg);
         exit(EXIT_FAILURE);
     }
     ASM_81Funcs[ret.reg](&ret, disp, val);
@@ -779,7 +779,7 @@ void ASM_83(u8 rm, u8 sib, s32 disp, u8 val) {
     ASM_incIP(3, &ret);
 
     if (ASM_83Funcs[ret.reg] == 0) {
-        printf("UNIMPLEMENTED OPCODE: 83 %X", ret.reg);
+        printf("UNIMPLEMENTED OPCODE: 83 /%X", ret.reg);
         exit(EXIT_FAILURE);
     }
     ASM_83Funcs[ret.reg](&ret, disp, val);
@@ -981,6 +981,21 @@ void ASM_90(void) {
     ASM_end();
 }
 
+// MOV r(8), imm(8)
+void ASM_BL(u8 in, u8 val) {
+    u8 r = (in % 8);
+    r = IS_B(r, r + 8);
+    
+    if (r >= 4 && r < 8) regs[r].h = val;
+    else                 regs[r].l = val;
+    
+    ASM_incIP(IS_REX(2, 3), NULL);
+    printf("MOV %s, 0x%.2X", ASM_getRegName(r, (r >= 4 && r < 8) ? R_Bit8H : R_Bit8), (u8)val);
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // 0x9A invalid
 
 // MOV r(16-64), imm(16-64)
@@ -1012,7 +1027,7 @@ void ASM_C1(u8 rm, u8 sib, s32 disp, u8 val) {
     ASM_incIP(3, &ret);
 
     if (ASM_C1Funcs[ret.reg] == 0) {
-        printf("UNIMPLEMENTED OPCODE: C1 %X", ret.reg);
+        printf("UNIMPLEMENTED OPCODE: C1 /%X", ret.reg);
         exit(EXIT_FAILURE);
     }
     ASM_C1Funcs[ret.reg](&ret, disp, val);
@@ -1099,7 +1114,7 @@ void ASM_D1(u8 rm, u8 sib, s32 disp) {
     ASM_incIP(2, &ret);
 
     if (ASM_D1Funcs[ret.reg] == 0) {
-        printf("UNIMPLEMENTED OPCODE: D1 %X", ret.reg);
+        printf("UNIMPLEMENTED OPCODE: D1 /%X", ret.reg);
         exit(EXIT_FAILURE);
     }
     ASM_D1Funcs[ret.reg](&ret, disp);
@@ -1199,7 +1214,7 @@ void ASM_F6(u8 rm, u8 sib, s32 disp, u8 val) {
     ASM_incIP(3, &ret);
 
     if (ASM_F6Funcs[ret.reg] == 0) {
-        printf("UNIMPLEMENTED OPCODE: F6 %X", ret.reg);
+        printf("UNIMPLEMENTED OPCODE: F6 /%X", ret.reg);
         exit(EXIT_FAILURE);
     }
     ASM_F6Funcs[ret.reg](&ret, disp, val);
@@ -1213,7 +1228,7 @@ void ASM_F7(u8 rm, u8 sib, s32 disp, u8 val) {
     ASM_incIP(3, &ret);
 
     if (ASM_F7Funcs[ret.reg] == 0) {
-        printf("UNIMPLEMENTED OPCODE: F7 %X", ret.reg);
+        printf("UNIMPLEMENTED OPCODE: F7 /%X", ret.reg);
         exit(EXIT_FAILURE);
     }
     ASM_F7Funcs[ret.reg](&ret, disp, val);
@@ -1226,7 +1241,7 @@ void ASM_FF(u8 rm, u8 sib, s32 disp) {
     RM ret = ASM_getRM(rm, sib, R_Bit32);
 
     if (ASM_FFFuncs[ret.reg] == 0) {
-        printf("UNIMPLEMENTED OPCODE: FF %X", ret.reg);
+        printf("UNIMPLEMENTED OPCODE: FF /%X", ret.reg);
         exit(EXIT_FAILURE);
     }
     ASM_FFFuncs[ret.reg](&ret, disp);

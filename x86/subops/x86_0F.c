@@ -925,6 +925,27 @@ void ASM_0F_B6(Data *data) {
     ASM_end();
 }
 
+#include "x86_0F_BA.c"
+void ASM_0F_BA(Data *data) {
+    RM ret = ASM_getRM(data->rm_code, data->sib, R_Bit32);
+    ASM_incIP(3, &ret);
+
+    if (ret.reg < 4) {
+        printf("UNDEFINED OPCODE: 0F BA /%X", ret.reg);
+        exit(EXIT_FAILURE);
+    }
+
+    ret.reg -= 4;
+
+    if (ASM_0F_BAFuncs[ret.reg] == 0) {
+        printf("UNIMPLEMENTED OPCODE: 0F BA /%X", ret.reg + 4);
+        exit(EXIT_FAILURE);
+    }
+    ASM_0F_BAFuncs[ret.reg](&ret, data->disp, data->val);
+
+    ASM_end();
+}
+
 ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 0X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 1X */ ASM_0F_10, ASM_0F_11, 0, 0, 0, 0, ASM_0F_16, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
@@ -937,7 +958,7 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 8X */ 0, 0, 0, ASM_0F_83, ASM_0F_84, ASM_0F_85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 9X */ 0, 0, 0, 0, 0, ASM_0F_95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* AX */ 0, 0, ASM_0F_A2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_AF, 
-/* BX */ 0, ASM_0F_B1, 0, 0, 0, 0, ASM_0F_B6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* BX */ 0, ASM_0F_B1, 0, 0, 0, 0, ASM_0F_B6, 0, 0, 0, ASM_0F_BA, 0, 0, 0, 0, 0, 
 /* CX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* DX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* EX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
