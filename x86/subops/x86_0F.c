@@ -181,6 +181,56 @@ void ASM_0F_1F(Data *data) {
     ASM_end();
 }
 
+// MOVAPS xmm, r/m(xmm)
+// MOVAPD xmm, r/m(xmm)
+void ASM_0F_28(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Float128);
+    ASM_incIP(3, &rm);
+
+    rm.otype = R_Float128;
+    if (!rm.isPtr) rm.atype = R_Float128;
+
+    s64 fdisp = ASM_getDisp(&rm, data->disp);
+
+    // check if aligned
+    if (((fdisp) / 4) * 4 != fdisp) {
+        printf("GENERAL PROTECTION FAULT: %.8X", (u32)fdisp);
+        exit(EXIT_FAILURE);
+    }
+    
+    if (rm.isPtr) {
+        if (!oper) {
+            STACK32F(temp1, fdisp + 0x0);
+            STACK32F(temp2, fdisp + 0x4);
+            STACK32F(temp3, fdisp + 0x8);
+            STACK32F(temp4, fdisp + 0xC);
+            fregs[rm.oreg].f[0] = *temp1;
+            fregs[rm.oreg].f[1] = *temp2;
+            fregs[rm.oreg].f[2] = *temp3;
+            fregs[rm.oreg].f[3] = *temp4;
+            ASM_rmPrint("MOVAPS", &rm, data->disp, v_Reg, true);
+        } else {
+            STACK64F(temp1, fdisp + 0x0);
+            STACK64F(temp2, fdisp + 0x8);
+            fregs[rm.oreg].d[0] = *temp1;
+            fregs[rm.oreg].d[1] = *temp2;
+            ASM_rmPrint("MOVAPD", &rm, data->disp, v_Reg, true);
+        }
+
+    } else {
+        fregs[rm.oreg].xi = fregs[rm.areg].xi;
+        if (!oper)
+            printf("MOVAPS %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+        else
+            printf("MOVAPD %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
+// MOVAPS r/m(xmm), xmm
+// MOVAPD r/m(xmm), xmm
 void ASM_0F_29(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Float128);
     ASM_incIP(3, &rm);
@@ -626,6 +676,40 @@ void ASM_0F_85(Data *data) {
     _ASM_0F_85(data);
 }
 
+// JA long
+bool _ASM_0F_87(Data *data) {
+    Reg conv = { .e = data->val };
+    ASM_incIP(IS_OP(6, 4), NULL);
+
+    if (!oper)  printf("JA 0x%.4X", conv.e);
+    else        printf("JA 0x%.2X", conv.x);
+    
+    if (f.f.cf || f.f.zf) { // if carry or zero, dont jump
+        ASM_rexPrint();
+        ASM_end();
+        return false;
+    }
+
+    if (!oper)  regs[16].e += conv.e;
+    else        regs[16].x += conv.x;
+    
+    printf(" -> PASSED");
+
+    ASM_rexPrint();
+    ASM_end();
+    
+    if (data->call) {
+        ASM_codeFunc func = ASM_getCurrFunc();
+        func();
+    } else {
+        return true;
+    }
+}
+
+void ASM_0F_87(Data *data) {
+    _ASM_0F_87(data);
+}
+
 void ASM_0F_95(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit8);
     ASM_incIP(2, &rm);
@@ -826,7 +910,7 @@ void ASM_0F_B6(Data *data) {
 ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 0X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 1X */ ASM_0F_10, ASM_0F_11, 0, 0, 0, 0, ASM_0F_16, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
-/* 2X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_29, 0, 0, 0, 0, 0, 0, 
+/* 2X */ 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_28, ASM_0F_29, 0, 0, 0, 0, 0, 0, 
 /* 3X */ 0, ASM_0F_31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 4X */ 0, 0, 0, 0, 0, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 5X */ 0, 0, 0, 0, 0, 0, 0, ASM_0F_57, 0, 0, 0, 0, 0, 0, 0, 0, 

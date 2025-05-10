@@ -941,7 +941,7 @@ void ASM_BH(u8 in, u64 val) {
     r = IS_B(r, r + 8);
     if (oper) {
         regs[r].x = val;
-        ASM_incIP(4, NULL);
+        ASM_incIP(IS_REX(4, 5), NULL);
         printf("MOV %s, 0x%.4X", ASM_getRegName(r, R_Bit16), regs[r].x);
         ASM_rexPrint();
     } else if (rex.w) {
@@ -951,7 +951,7 @@ void ASM_BH(u8 in, u64 val) {
         ASM_rexPrint();
     } else {
         regs[r].e = val;
-        ASM_incIP(6, NULL);
+        ASM_incIP(IS_REX(5, 6), NULL);
         printf("MOV %s, 0x%.8X", ASM_getRegName(r, R_Bit32), regs[r].e);
         ASM_rexPrint();
     }
