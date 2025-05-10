@@ -281,6 +281,54 @@ void ASM_31(u8 rm_code, u8 sib, s32 disp) {
     ASM_end();
 }
 
+// XOR r(8), r/m(8)
+void ASM_32(u8 rm_code, u8 sib, s32 disp) {
+    RM rm = ASM_getRM(rm_code, sib, R_Bit8);
+    ASM_incIP(2, &rm);
+    
+    Reg prev = { 0 };
+    Reg res = { 0 };
+
+    if (rm.isPtr) {
+        s64 fdisp = ASM_getDisp(&rm, disp);
+
+        STACK8(temp, fdisp);
+        if (rm.otype == R_Bit8H) {
+            prev.l = regs[rm.oreg].h;
+            res.l = *temp;
+            regs[rm.oreg].h ^= *temp;
+        } else {
+            prev.l = regs[rm.oreg].l;
+            res.l = *temp;
+            regs[rm.oreg].l ^= *temp;
+        }
+
+        ASM_rmPrint("XOR", &rm, disp, v_Reg, true);
+    } else {
+        if (rm.otype == R_Bit8H) {
+            prev.l = regs[rm.oreg].h;
+            regs[rm.oreg].h ^= (rm.atype == R_Bit8H) ? regs[rm.areg].h : regs[rm.areg].l;
+        } else {
+            prev.l = regs[rm.oreg].l;
+            regs[rm.oreg].l ^= (rm.atype == R_Bit8H) ? regs[rm.areg].h : regs[rm.areg].l;
+        }
+        
+        printf("XOR %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+    }
+
+    res.l ^= prev.l;
+    
+    u8 fa = f.f.af;
+    u8 fc = f.f.cf;
+    ASM_setFlags(&prev, &res, rm.otype, false);
+    f.f.af = fa;
+    f.f.cf = fc;
+    f.f.of = 0;
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // XOR r(16-64), r/m(16-64)
 void ASM_33(u8 rm_code, u8 sib, s32 disp) {
     RM rm = ASM_getRM(rm_code, sib, R_Bit32);

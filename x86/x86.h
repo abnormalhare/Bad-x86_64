@@ -18,6 +18,7 @@ bool _ASM_0F_87(Data *data);
 void ASM_23(u8 rm_code, u8 sib, s32 disp);
 void ASM_2B(u8 rm_code, u8 sib, s32 disp);
 void ASM_31(u8 rm_code, u8 sib, s32 disp);
+void ASM_32(u8 rm_code, u8 sib, s32 disp);
 void ASM_33(u8 rm_code, u8 sib, s32 disp);
 void ASM_39(u8 rm_code, u8 sib, s32 disp);
 void ASM_3B(u8 rm_code, u8 sib, s32 disp);

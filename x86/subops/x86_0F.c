@@ -735,6 +735,24 @@ void ASM_0F_95(Data *data) {
     ASM_end();
 }
 
+// CPUID
+void ASM_0F_A2(Data *data) {
+    int cpuInfo[4];
+
+    ASM_incIP(1, NULL);
+
+    __cpuidex(cpuInfo, regs[0].e, regs[1].e);
+
+    regs[0].e = cpuInfo[0]; regs[0].eh = 0;
+    regs[3].e = cpuInfo[1]; regs[3].eh = 0;
+    regs[1].e = cpuInfo[2]; regs[1].eh = 0;
+    regs[2].e = cpuInfo[3]; regs[2].eh = 0;
+
+    printf("CPUID");
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // IMUL r(16-64), r/m(16-64)
 void ASM_0F_AF(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
@@ -918,7 +936,7 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 7X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_7F, 
 /* 8X */ 0, 0, 0, ASM_0F_83, ASM_0F_84, ASM_0F_85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 9X */ 0, 0, 0, 0, 0, ASM_0F_95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* AX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_AF, 
+/* AX */ 0, 0, ASM_0F_A2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_AF, 
 /* BX */ 0, ASM_0F_B1, 0, 0, 0, 0, ASM_0F_B6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* CX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* DX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
