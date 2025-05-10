@@ -193,6 +193,7 @@ extern u8 *stack;
 #define ALIGN_STACK_256 31
 #define ALIGN_STACK_512 63
 
+#define STACKSTRP(n, v) n = (char*)&stack[v]
 #define STACK8P(n, v) n = (u8*)&stack[v]
 #define STACK16P(n, v) n = (u16*)&stack[v]
 #define STACK32P(n, v) n = (u32*)&stack[v]
@@ -203,6 +204,7 @@ extern u8 *stack;
 #define STACK256P(n, v) n = (__m256i*)&stack[v]
 #define STACK512P(n, v) n = (__m512i*)&stack[v]
 
+#define STACKSTR(n, v) char*n; STACKSTRP(n, v)
 #define STACK8(n, v) u8*n; STACK8P(n, v)
 #define STACK16(n, v) u16*n; STACK16P(n, v)
 #define STACK32(n, v) u32*n; STACK32P(n, v)

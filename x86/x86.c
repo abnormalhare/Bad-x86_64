@@ -412,6 +412,37 @@ void ASM_3B(u8 rm_code, u8 sib, s32 disp) {
     ASM_end();
 }
 
+void ASM_3D(s32 val) {
+    RegType type = IS_OP(IS_W(R_Bit32, R_Bit64), R_Bit16);
+    Reg res = {0};
+
+    switch (type) {
+        case R_Bit16:
+            ASM_incIP(4, NULL);
+            val = (s16)(u32)val;
+            res.x = regs[0].x - val;
+            break;
+        case R_Bit32:
+            ASM_incIP(5, NULL);
+            res.e = regs[0].e - val;
+            break;
+        case R_Bit64:
+            ASM_incIP(6, NULL);
+            res.r = regs[0].r - val;
+            break;
+
+        default: break;
+
+    }
+
+    if (type != R_Bit16) printf("CMP %s, 0x%.8X", ASM_getRegName(0, type), val);
+    else                 printf("CMP %s, 0x%.4X", ASM_getRegName(0, type), val);
+
+    ASM_setFlags(&regs[0], &res, type, true);
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // 0x3F invalid
 
 // REX Prefix
@@ -621,6 +652,28 @@ bool _ASM_77(s8 val) {
         printf(" (loop)");
     }
     if (f.f.zf || f.f.cf) { // if it is zero OR carry, dont jump
+        ASM_rexPrint();
+        ASM_end();
+        return false;
+    }
+
+    regs[16].e += val;
+    printf(" -> PASSED");
+    
+    ASM_rexPrint();
+    ASM_end();
+    return true;
+}
+
+// JNS rel(8)
+bool _ASM_79(s8 val) {
+    ASM_incIP(2, NULL);
+    
+    printf("JS 0x%.2X",(u8) val);
+    if (val > 0x7F) {
+        printf(" (loop)");
+    }
+    if (f.f.sf) { // if not sign, dont jump
         ASM_rexPrint();
         ASM_end();
         return false;
@@ -920,7 +973,7 @@ void ASM_C1(u8 rm, u8 sib, s32 disp, u8 val) {
 }
 
 // RETN
-void ASM_C3(void) {
+void _ASM_C3(void) {
     STACK64(temp, regs[4].e);
     regs[4].r += 8;
     regs[16].e = *temp;
@@ -1034,7 +1087,7 @@ void ASM_E8(u32 val) {
 }
 
 // JMP rel(16/32)
-void ASM_E9(u32 val) {
+bool ASM_E9(u32 val, bool call) {
     ASM_codeFunc func;
     Reg conv;
 
@@ -1050,8 +1103,10 @@ void ASM_E9(u32 val) {
     }
     ASM_rexPrint();
 
-    func = ASM_getFunc(regs[16].e);
-    func();
+    if (call) {
+        func = ASM_getFunc(regs[16].e);
+        func();
+    }
 }
 
 // 0xEA invalid
