@@ -1097,7 +1097,7 @@ void _ASM_C3(void) {
     regs[16].e = *temp;
     printf("RETN");
     ASM_rexPrint();
-    printf("---\n\n(%.8X)\n", regs[16].e);
+    ASM_retPrint();
     ASM_end();
 }
 

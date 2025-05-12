@@ -2,6 +2,8 @@
 The worst way to make an x86_64 emulator. This is a library. The file to include is `x86.c`.
 
 ## How to use
+
+Use this code block and the comments as a simple way to use this emulator!
 ```c
 #include "x86/x86.h"
 

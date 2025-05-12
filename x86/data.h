@@ -243,6 +243,7 @@ const char* ASM_ptrName(RegType bits);
 void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip);
 void ASM_rexPrint(void);
 void ASM_regPrint(void);
+void ASM_retPrint(void);
 void ASM_end(void);
 void ASM_exit(void);
 

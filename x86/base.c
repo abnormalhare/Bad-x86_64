@@ -496,6 +496,10 @@ void ASM_regPrint(void) {
     printf("-----\n%s", buf);
 }
 
+void ASM_retPrint(void) {
+    printf("---\n\n(%.8X)\n", regs[16].e);
+}
+
 void ASM_end(void) {
     rex.enable = 0;
     rex.w = 0;

@@ -702,9 +702,8 @@ bool _ASM_0F_82(Data *data) {
     if (data->call) {
         ASM_codeFunc func = ASM_getCurrFunc();
         func();
-    } else {
-        return true;
     }
+    return true;
 }
 
 void ASM_0F_82(Data *data) {
@@ -736,9 +735,8 @@ bool _ASM_0F_83(Data *data) {
     if (data->call) {
         ASM_codeFunc func = ASM_getCurrFunc();
         func();
-    } else {
-        return true;
     }
+    return true;
 }
 
 void ASM_0F_83(Data *data) {
@@ -770,9 +768,8 @@ bool _ASM_0F_84(Data *data) {
     if (data->call) {
         ASM_codeFunc func = ASM_getCurrFunc();
         func();
-    } else {
-        return true;
     }
+    return true;
 }
 
 void ASM_0F_84(Data *data) {
@@ -804,9 +801,8 @@ bool _ASM_0F_85(Data *data) {
     if (data->call) {
         ASM_codeFunc func = ASM_getCurrFunc();
         func();
-    } else {
-        return true;
     }
+    return true;
 }
 
 void ASM_0F_85(Data *data) {
@@ -838,9 +834,8 @@ bool _ASM_0F_87(Data *data) {
     if (data->call) {
         ASM_codeFunc func = ASM_getCurrFunc();
         func();
-    } else {
-        return true;
     }
+    return true;
 }
 
 void ASM_0F_87(Data *data) {
@@ -1054,7 +1049,7 @@ void ASM_0F_B6(Data *data) {
             }
         }
 
-        rm.atype = type;
+        rm.ptrtype = type;
         ASM_rmPrint("MOVZX", &rm, data->disp, v_Reg, true);
     } else {
         if (type == R_Bit8) {
@@ -1074,6 +1069,38 @@ void ASM_0F_B6(Data *data) {
         }
         
         printf("MOVZX %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, type));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
+// MOVZX r(16-64), r/m(16)
+void ASM_0F_B7(Data *data) {
+    RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit32);
+    ASM_incIP(3, &rm);
+
+    if (rm.isPtr) {
+        s64 fdisp = ASM_getDisp(&rm, data->disp);
+
+        switch (rm.otype) {
+            case R_Bit16: { STACK16(temp, fdisp); regs[rm.oreg].x = *temp; break; }
+            case R_Bit32: { STACK32(temp, fdisp); regs[rm.oreg].x = *temp; break; }
+            case R_Bit64: { STACK64(temp, fdisp); regs[rm.oreg].x = *temp; break; }
+            default: break;
+        }
+
+        rm.ptrtype = R_Bit16;
+        ASM_rmPrint("MOVZX", &rm, data->disp, v_Reg, true);
+    } else {
+        switch (rm.otype) {
+            case R_Bit16: regs[rm.oreg].x = regs[rm.areg].x; break;
+            case R_Bit32: regs[rm.oreg].x = regs[rm.areg].e; break;
+            case R_Bit64: regs[rm.oreg].x = regs[rm.areg].r; break;
+            default: break;
+        }
+        
+        printf("MOVZX %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, R_Bit16));
     }
 
     ASM_rexPrint();
@@ -1113,7 +1140,7 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 8X */ 0, 0, 0, ASM_0F_83, ASM_0F_84, ASM_0F_85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 9X */ 0, 0, 0, 0, 0, ASM_0F_95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* AX */ 0, 0, ASM_0F_A2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_AF, 
-/* BX */ 0, ASM_0F_B1, 0, 0, 0, 0, ASM_0F_B6, 0, 0, 0, ASM_0F_BA, 0, 0, 0, 0, 0, 
+/* BX */ 0, ASM_0F_B1, 0, 0, 0, 0, ASM_0F_B6, ASM_0F_B7, 0, 0, ASM_0F_BA, 0, 0, 0, 0, 0, 
 /* CX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* DX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* EX */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
