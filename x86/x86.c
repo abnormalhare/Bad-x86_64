@@ -533,7 +533,7 @@ void ASM_5L(u8 in) {
 
 // POP r(16/64)
 void ASM_5H(u8 in) {
-    ASM_incIP(1, NULL);
+    ASM_incIP(IS_B(1, 2), NULL);
 
     u8 reg = in % 8;
     reg = IS_B(reg, reg + 8);
@@ -1008,6 +1008,30 @@ void ASM_90(void) {
     ASM_incIP(1, NULL);
 
     printf("NOP");
+    ASM_rexPrint();
+    ASM_end();
+}
+
+void ASM_AA(void) {
+    u64 cnt = regs[1].r;
+    u64 *st = &regs[7].r;
+
+    if (sing) {
+        ASM_incIP(2, NULL);
+        while (cnt-- > 0) {
+            STACK8(temp, (*st)++);
+            *temp = regs[0].l;
+        }
+
+        printf("REP STOSB");
+    } else {
+        ASM_incIP(1, NULL);
+        STACK8(temp, *st++);
+        *temp = regs[0].l;
+
+        printf("STOSB");
+    }
+
     ASM_rexPrint();
     ASM_end();
 }
