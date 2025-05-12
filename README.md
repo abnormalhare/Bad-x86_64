@@ -33,6 +33,7 @@ int main() {
   setupStack();
 
   ASM_incIP(0x1000, NULL); // set instruction pointer
+  regs[4].r -= 8; // its suggested to decrement the stack pointer by 1 64bit number
   ASM_codeFunc func = ASM_getCurrFunc(); // get the function at the IP
   func(); // call the function
 
