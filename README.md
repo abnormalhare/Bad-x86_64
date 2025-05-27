@@ -23,7 +23,8 @@ void setupStack() {
   { STACK8(temp, 0); *temp = 'M'; } // this is how to store data into the stack
   { STACK16(temp, 8); *temp = 0x3F40; }
   { STACK32(temp, 0x24); *temp = 0x46404938; }
-  { STACK64(temp, 0x1000); *temp = (u64)&asm_func; } // s and u types are predefined! (s8, s16..., u8, u16...)
+  { STACK64(temp, 0x1000); *temp = (u64)&asm_func; }
+      // s and u types are predefined! (s8, s16..., u8, u16...)
 }
 
 int main() {
@@ -32,6 +33,7 @@ int main() {
   setupStack();
 
   ASM_incIP(0x1000, NULL); // set instruction pointer
+  regs[4].r -= 8; // its suggested to decrement the stack pointer by 1 64bit number
   ASM_codeFunc func = ASM_getCurrFunc(); // get the function at the IP
   func(); // call the function
 
