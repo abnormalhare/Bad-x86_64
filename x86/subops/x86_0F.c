@@ -875,6 +875,72 @@ void ASM_0F_88(Data *data) {
     _ASM_0F_88(data);
 }
 
+// JNS long
+bool _ASM_0F_89(Data *data) {
+    Reg conv = { .e = data->val };
+    ASM_incIP(IS_OP(6, 4), NULL);
+
+    if (!oper)  printf("JNS 0x%.4X", conv.e);
+    else        printf("JNS 0x%.2X", conv.x);
+    
+    if (f.f.sf) { // if sign, dont jump
+        ASM_rexPrint();
+        ASM_end();
+        return false;
+    }
+
+    if (!oper)  regs[16].e += conv.e;
+    else        regs[16].x += conv.x;
+    
+    printf(" -> PASSED");
+
+    ASM_rexPrint();
+    ASM_end();
+    
+    if (data->call) {
+        ASM_codeFunc func = ASM_getCurrFunc();
+        func();
+    }
+    return true;
+}
+
+void ASM_0F_89(Data *data) {
+    _ASM_0F_89(data);
+}
+
+// JLE long
+bool _ASM_0F_8E(Data *data) {
+    Reg conv = { .e = data->val };
+    ASM_incIP(IS_OP(6, 4), NULL);
+
+    if (!oper)  printf("JLE 0x%.4X", conv.e);
+    else        printf("JLE 0x%.2X", conv.x);
+    
+    if (!f.f.zf && f.f.sf == f.f.of) { // if not equal AND sign == overflow (not less)
+        ASM_rexPrint();
+        ASM_end();
+        return false;
+    }
+
+    if (!oper)  regs[16].e += conv.e;
+    else        regs[16].x += conv.x;
+    
+    printf(" -> PASSED");
+
+    ASM_rexPrint();
+    ASM_end();
+    
+    if (data->call) {
+        ASM_codeFunc func = ASM_getCurrFunc();
+        func();
+    }
+    return true;
+}
+
+void ASM_0F_8E(Data *data) {
+    _ASM_0F_8E(data);
+}
+
 void ASM_0F_95(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit8);
     ASM_incIP(2, &rm);

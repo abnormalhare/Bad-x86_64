@@ -15,6 +15,8 @@ bool _ASM_0F_84(Data *data);
 bool _ASM_0F_85(Data *data);
 bool _ASM_0F_87(Data *data);
 bool _ASM_0F_88(Data *data);
+bool _ASM_0F_89(Data *data);
+bool _ASM_0F_8E(Data *data);
 #define ASM_0F_J(ix, data, t) if (_ASM_0F_## ix (data)) goto JMP_##t; ASM_end()
 #define ASM_0F_R(ix, data) if (_ASM_0F_## ix (data)) return; ASM_end()
 
