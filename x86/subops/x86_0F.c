@@ -842,6 +842,39 @@ void ASM_0F_87(Data *data) {
     _ASM_0F_87(data);
 }
 
+// JS long
+bool _ASM_0F_88(Data *data) {
+    Reg conv = { .e = data->val };
+    ASM_incIP(IS_OP(6, 4), NULL);
+
+    if (!oper)  printf("JS 0x%.4X", conv.e);
+    else        printf("JS 0x%.2X", conv.x);
+    
+    if (!f.f.sf) { // if not sign, dont jump
+        ASM_rexPrint();
+        ASM_end();
+        return false;
+    }
+
+    if (!oper)  regs[16].e += conv.e;
+    else        regs[16].x += conv.x;
+    
+    printf(" -> PASSED");
+
+    ASM_rexPrint();
+    ASM_end();
+    
+    if (data->call) {
+        ASM_codeFunc func = ASM_getCurrFunc();
+        func();
+    }
+    return true;
+}
+
+void ASM_0F_88(Data *data) {
+    _ASM_0F_88(data);
+}
+
 void ASM_0F_95(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Bit8);
     ASM_incIP(2, &rm);

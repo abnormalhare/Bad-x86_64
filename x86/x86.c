@@ -126,6 +126,7 @@ void ASM_0B(u8 rm_code, u8 sib, s32 disp) {
     ASM_end();
 }
 
+// OR AL, imm(8)
 void ASM_0C(u8 val) {
     ASM_incIP(2, NULL);
 
@@ -394,6 +395,44 @@ void ASM_33(u8 rm_code, u8 sib, s32 disp) {
 }
 
 // 0x37 invalid
+
+// CMP r/m(8), r(8)
+void ASM_38(u8 rm_code, u8 sib, s32 disp) {
+    RM rm = ASM_getRM(rm_code, sib, R_Bit8);
+    ASM_incIP(2, &rm);
+    
+    Reg prev = { 0 };
+    Reg res = { 0 };
+
+    if (rm.isPtr) {
+        s64 fdisp = ASM_getDisp(&rm, disp);
+
+        STACK8(temp, fdisp);
+        if (rm.otype == R_Bit8H) {
+            prev.l = regs[rm.oreg].h;
+        } else {
+            prev.l = regs[rm.oreg].l;
+        }
+        res.l = *temp - prev.l;
+        prev.l = *temp;
+
+        ASM_rmPrint("CMP", &rm, disp, v_Reg, false);
+    } else {
+        if (rm.otype == R_Bit8H) {
+            prev.l = regs[rm.oreg].h;
+        } else {
+            prev.l = regs[rm.oreg].l;
+        }
+        res.l = regs[rm.areg].l - prev.l;
+        prev.l = regs[rm.areg].l;
+        
+        printf("CMP %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+    }
+    
+    ASM_setFlags(&prev, &res, rm.otype, true);
+    ASM_rexPrint();
+    ASM_end();
+}
 
 // CMP r/m(16-64), r(16-64)
 void ASM_39(u8 rm_code, u8 sib, s32 disp) {
@@ -734,7 +773,7 @@ bool _ASM_77(s8 val) {
 bool _ASM_79(s8 val) {
     ASM_incIP(2, NULL);
     
-    printf("JS 0x%.2X",(u8) val);
+    printf("JNS 0x%.2X",(u8) val);
     if (val > 0x7F) {
         printf(" (loop)");
     }
@@ -775,8 +814,8 @@ bool _ASM_7C(s8 val) {
 }
 
 #include "subops/x86_80.c"
-void ASM_80(u8 rm, u8 sib, s32 disp, u8 val) {
-    RM ret = ASM_getRM(rm, sib, R_Bit8);
+void ASM_80(u8 rm_code, u8 sib, s32 disp, u8 val) {
+    RM ret = ASM_getRM(rm_code, sib, R_Bit8);
     ASM_incIP(3, &ret);
 
     if (ASM_80Funcs[ret.reg] == 0) {
@@ -789,8 +828,8 @@ void ASM_80(u8 rm, u8 sib, s32 disp, u8 val) {
 }
 
 #include "subops/x86_81.c"
-void ASM_81(u8 rm, u8 sib, s32 disp, u32 val) {
-    RM ret = ASM_getRM(rm, sib, R_Bit32);
+void ASM_81(u8 rm_code, u8 sib, s32 disp, u32 val) {
+    RM ret = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(IS_OP(6, 4), &ret);
 
     if (ASM_81Funcs[ret.reg] == 0) {
@@ -805,8 +844,8 @@ void ASM_81(u8 rm, u8 sib, s32 disp, u32 val) {
 // 0x82 invalid
 
 #include "subops/x86_83.c"
-void ASM_83(u8 rm, u8 sib, s32 disp, u8 val) {
-    RM ret = ASM_getRM(rm, sib, R_Bit32);
+void ASM_83(u8 rm_code, u8 sib, s32 disp, u8 val) {
+    RM ret = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(3, &ret);
 
     if (ASM_83Funcs[ret.reg] == 0) {
@@ -815,6 +854,44 @@ void ASM_83(u8 rm, u8 sib, s32 disp, u8 val) {
     }
     ASM_83Funcs[ret.reg](&ret, disp, val);
 
+    ASM_end();
+}
+
+// TEST r/m(8), r(8)
+void ASM_84(u8 rm_code, u8 sib, s32 disp) {
+    RM rm = ASM_getRM(rm_code, sib, R_Bit8);
+    ASM_incIP(2, &rm);
+    
+    Reg prev = { 0 };
+    Reg res = { 0 };
+
+    if (rm.isPtr) {
+        s64 fdisp = ASM_getDisp(&rm, disp);
+
+        STACK8(temp, fdisp);
+        if (rm.otype == R_Bit8H) {
+            prev.l = regs[rm.oreg].h;
+        } else {
+            prev.l = regs[rm.oreg].l;
+        }
+        res.l = *temp & prev.l;
+        prev.l = *temp;
+
+        ASM_rmPrint("TEST", &rm, disp, v_Reg, false);
+    } else {
+        if (rm.otype == R_Bit8H) {
+            prev.l = regs[rm.oreg].h;
+        } else {
+            prev.l = regs[rm.oreg].l;
+        }
+        res.l = regs[rm.areg].l & prev.l;
+        prev.l = regs[rm.areg].l;
+        
+        printf("TEST %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
+    }
+    
+    ASM_setFlags(&prev, &res, rm.otype, true);
+    ASM_rexPrint();
     ASM_end();
 }
 
@@ -1012,6 +1089,21 @@ void ASM_90(void) {
     ASM_end();
 }
 
+// TEST AL, imm(8)
+void ASM_A8(u8 val) {
+    ASM_incIP(2, NULL);
+
+    Reg prev = { .l = regs[0].l    };
+    Reg res =  { .l = prev.l & val };
+
+    printf("TEST al, 0x%.2X", val);
+    
+    ASM_setFlags(&prev, &res, R_Bit8, false);
+    f.f.af = 0;
+    ASM_rexPrint();
+    ASM_end();
+}
+
 void ASM_AA(void) {
     u64 cnt = regs[1].r;
     u64 *st = &regs[7].r;
@@ -1077,8 +1169,8 @@ void ASM_BH(u8 in, u64 val) {
 }
 
 #include "subops/x86_C1.c"
-void ASM_C1(u8 rm, u8 sib, s32 disp, u8 val) {
-    RM ret = ASM_getRM(rm, sib, R_Bit32);
+void ASM_C1(u8 rm_code, u8 sib, s32 disp, u8 val) {
+    RM ret = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(3, &ret);
 
     if (ASM_C1Funcs[ret.reg] == 0) {
@@ -1164,8 +1256,8 @@ void ASM_C7(u8 rm_code, u8 sib, s32 disp, u32 val) {
 }
 
 #include "subops/x86_D1.c"
-void ASM_D1(u8 rm, u8 sib, s32 disp) {
-    RM ret = ASM_getRM(rm, sib, R_Bit32);
+void ASM_D1(u8 rm_code, u8 sib, s32 disp) {
+    RM ret = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(2, &ret);
 
     if (ASM_D1Funcs[ret.reg] == 0) {
@@ -1264,8 +1356,8 @@ void ASM_F3(void) {
 }
 
 #include "subops/x86_F6.c"
-void ASM_F6(u8 rm, u8 sib, s32 disp, u8 val) {
-    RM ret = ASM_getRM(rm, sib, R_Bit8);
+void ASM_F6(u8 rm_code, u8 sib, s32 disp, u8 val) {
+    RM ret = ASM_getRM(rm_code, sib, R_Bit8);
     ASM_incIP(3, &ret);
 
     if (ASM_F6Funcs[ret.reg] == 0) {
@@ -1278,8 +1370,8 @@ void ASM_F6(u8 rm, u8 sib, s32 disp, u8 val) {
 }
 
 #include "subops/x86_F7.c"
-void ASM_F7(u8 rm, u8 sib, s32 disp, u8 val) {
-    RM ret = ASM_getRM(rm, sib, R_Bit32);
+void ASM_F7(u8 rm_code, u8 sib, s32 disp, u32 val) {
+    RM ret = ASM_getRM(rm_code, sib, R_Bit32);
     ASM_incIP(3, &ret);
 
     if (ASM_F7Funcs[ret.reg] == 0) {
@@ -1292,8 +1384,8 @@ void ASM_F7(u8 rm, u8 sib, s32 disp, u8 val) {
 }
 
 #include "subops/x86_FF.c"
-void ASM_FF(u8 rm, u8 sib, s32 disp) {
-    RM ret = ASM_getRM(rm, sib, R_Bit32);
+void ASM_FF(u8 rm_code, u8 sib, s32 disp) {
+    RM ret = ASM_getRM(rm_code, sib, R_Bit32);
 
     if (ASM_FFFuncs[ret.reg] == 0) {
         printf("UNIMPLEMENTED OPCODE: FF /%X", ret.reg);
