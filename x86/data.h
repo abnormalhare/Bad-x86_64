@@ -5,12 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-#include <Windows.h>
-#include <intrin.h>
-#include <mmintrin.h>
-#include <immintrin.h>
-#include <emmintrin.h>
+#include <string.h>
 
 typedef int8_t s8;
 typedef uint8_t u8;
@@ -20,12 +15,40 @@ typedef int32_t s32;
 typedef uint32_t u32;
 typedef int64_t s64;
 typedef uint64_t u64;
-typedef __m128i u128;
+typedef struct s128 {
+    u64 low;
+    s64 high;
+} s128;
+typedef struct u128 {
+    u64 low;
+    u64 high;
+} u128;
+// typedef struct s256 {
+//     u128 low;
+//     s128 high;
+// } s256;
+// typedef struct u256 {
+//     u128 low;
+//     u128 high;
+// } u256;
+// typedef struct s512 {
+//     u256 low;
+//     s256 high;
+// } s512;
+// typedef struct u512 {
+//     u256 low;
+//     u256 high;
+// } u512;
+
 
 typedef float f32;
 typedef double f64;
-typedef __m128d f128;
-typedef __m256d f256;
+typedef long double f128;
+// typedef struct f256 {
+//     u8 sign : 1;
+//     u32 expo : 19;
+//     u256 mant;
+// } f256;
 
 typedef union _reg {
     u64 r;
@@ -40,19 +63,27 @@ typedef union _reg {
     };
 } Reg;
 
-typedef union _float_reg {
-    __m256i yi;
-    f256 yd;
-    __m128i xi;
+typedef union _xmm_reg {
+    u128 xi;
     f128 xd;
-    f64 d[8];
-    u64 ul[8];
-    f32 f[16];
-    u32 u[16];
-} FloatReg;
+    f64 d[2];
+    u64 ul[2];
+    f32 f[4];
+    u32 u[4];
+} XMMReg;
+
+// typedef union _ymm_reg {
+//     u256 yi;
+//     f256 yd;
+//     u128 xi[2];
+//     f128 xd[2];
+//     f64 d[4];
+//     u64 ul[4];
+//     f32 f[8];
+//     u32 u[8];
+// } YMMReg;
 
 typedef union _mmx_reg {
-    __m64 m;
     u64 u;
 } MMXReg;
 
@@ -170,8 +201,9 @@ typedef void (*ASM_dataFunc)(Data *);
 extern Reg regs[17];
 // order: ss, cs, ds, es, fs, gs
 extern u16 sregs[6];
-extern FloatReg fregs[16];
-extern MMXReg xregs[16];
+extern XMMReg xregs[16];
+// extern YMMReg yregs[16];
+extern MMXReg mregs[16];
 extern u64 stregs[8];
 extern Flags f;
 extern bool oper; // operand override prefix
@@ -229,6 +261,12 @@ extern u8 *stack;
 #define IS_REX(n, y) ((rex.enable == 0) ? (n) : (y))
 #define IS_FS(n, y) ((fs == false) ? (n) : (y))
 #define IS_GS(n, y) ((gs == false) ? (n) : (y))
+
+void u128_set(u128 *dest, u128 *src);
+void u128_set64(u128 *dest, u64 high, u64 low);
+// void u256_set(u256 *dest, u256 *src);
+// void u256_set128(u256 *dest, u128 *high, u128 *low);
+// void u256_set64(u256 *dest, u64 hh, u64 hl, u64 lh, u64 ll);
 
 void ASM_init();
 RM ASM_getRM(u8 rm, u8 sib, RegType type);

@@ -4,8 +4,9 @@
 Reg regs[17] = { 0 };
 // order: ss, cs, ds, es, fs, gs
 u16 sregs[6] = { 0 };
-FloatReg fregs[16] = { 0 };
-MMXReg xregs[16] = { 0 };
+XMMReg xregs[16] = { 0 };
+YMMReg yregs[16] = { 0 };
+MMXReg mregs[16] = { 0 };
 u64 stregs[8] = { 0 };
 Flags f = {0, .f.on = 1 };
 bool oper = false; // operand override prefix
@@ -30,7 +31,14 @@ void ASM_init() {
         }
     }
     for (int i = 0; i < 16; i++) {
-        fregs[i].yd = _mm256_set1_pd(0.0);
+        xregs[i].xi.low = 0;
+        xregs[i].xi.high = 0;
+    }
+    for (int i = 0; i < 16; i++) {
+        yregs[i].xi[0].low = 0;
+        yregs[i].xi[0].high = 0;
+        yregs[i].xi[1].low = 0;
+        yregs[i].xi[1].high = 0;
     }
 }
 
@@ -364,7 +372,7 @@ const char *ASM_ptrName(RegType bits) {
 }
 
 void ASM_rexPrint(void) {
-    printf("\n  |IP:%.8X|A:%.16llX C:%.16llX  D:%.16llX  B:%.16llX|XMM0L:%.8X%.8X|SP:%.8X :", regs[16].e, regs[0].r, regs[1].r, regs[2].r, regs[3].r, fregs[0].u[0], fregs[0].u[1], regs[4].e);
+    printf("\n  |IP:%.8X|A:%.16llX C:%.16llX  D:%.16llX  B:%.16llX|XMM0L:%.8X%.8X|SP:%.8X :", regs[16].e, regs[0].r, regs[1].r, regs[2].r, regs[3].r, xregs[0].u[0], xregs[0].u[1], regs[4].e);
     
     int sp = regs[4].e;
     if (sp < 0x80000000)
@@ -372,7 +380,7 @@ void ASM_rexPrint(void) {
                 stack[sp], stack[sp + 1], stack[sp + 2], stack[sp + 3], stack[sp + 4], stack[sp + 5], stack[sp + 6], stack[sp + 7]);
     else printf("\n");
     
-    printf("  |BP:%.8X|8:%.16llX 9:%.16llX 10:%.16llX 11:%.16llX|XMM0H:%.8X%.8X| F:%d%d%d%d%d%d%d%d :", regs[5].e, regs[8].r, regs[9].r, regs[10].r, regs[11].r, fregs[1].u[0], fregs[1].u[1], f.f.of, f.f.df, f.f.iF, f.f.sf, f.f.zf, f.f.af, f.f.pf, f.f.cf);
+    printf("  |BP:%.8X|8:%.16llX 9:%.16llX 10:%.16llX 11:%.16llX|XMM0H:%.8X%.8X| F:%d%d%d%d%d%d%d%d :", regs[5].e, regs[8].r, regs[9].r, regs[10].r, regs[11].r, xregs[1].u[0], xregs[1].u[1], f.f.of, f.f.df, f.f.iF, f.f.sf, f.f.zf, f.f.af, f.f.pf, f.f.cf);
 
     sp = regs[4].e + 8;
     if (sp < 0x80000000)
@@ -485,9 +493,9 @@ void ASM_regPrint(void) {
 
     for (int i = 0; i < 16; i++) {
         if (i < 10)
-            sprintf(buf, "%s%s:  %.16llX%.16llX  ", buf, ASM_getRegName(i, R_Float128), fregs[i].ul[0], fregs[i].ul[1]);
+            sprintf(buf, "%s%s:  %.16llX%.16llX  ", buf, ASM_getRegName(i, R_Float128), xregs[i].ul[0], xregs[i].ul[1]);
         else
-            sprintf(buf, "%s%s: %.16llX%.16llX  ", buf, ASM_getRegName(i, R_Float128), fregs[i].ul[0], fregs[i].ul[1]);
+            sprintf(buf, "%s%s: %.16llX%.16llX  ", buf, ASM_getRegName(i, R_Float128), xregs[i].ul[0], xregs[i].ul[1]);
         if (i % 2) {
             sprintf(buf, "%s\n", buf);
         }

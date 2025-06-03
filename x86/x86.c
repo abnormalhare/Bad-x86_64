@@ -769,6 +769,28 @@ bool _ASM_77(s8 val) {
     return true;
 }
 
+// JS rel(8)
+bool _ASM_78(s8 val) {
+    ASM_incIP(2, NULL);
+    
+    printf("JS 0x%.2X",(u8) val);
+    if (val > 0x7F) {
+        printf(" (loop)");
+    }
+    if (!f.f.sf) { // if not sign, dont jump
+        ASM_rexPrint();
+        ASM_end();
+        return false;
+    }
+
+    regs[16].e += val;
+    printf(" -> PASSED");
+    
+    ASM_rexPrint();
+    ASM_end();
+    return true;
+}
+
 // JNS rel(8)
 bool _ASM_79(s8 val) {
     ASM_incIP(2, NULL);
@@ -777,7 +799,7 @@ bool _ASM_79(s8 val) {
     if (val > 0x7F) {
         printf(" (loop)");
     }
-    if (f.f.sf) { // if not sign, dont jump
+    if (f.f.sf) { // if sign, dont jump
         ASM_rexPrint();
         ASM_end();
         return false;

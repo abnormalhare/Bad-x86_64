@@ -33,10 +33,10 @@ void ASM_0F_10(Data *data) {
             s64 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK64F(temp, fdisp);
-            fregs[rm.oreg].d[0] = *temp;
+            xregs[rm.oreg].d[0] = *temp;
             ASM_rmPrint("MOVSD", &rm, data->disp, v_Reg, true);
         } else {
-            fregs[rm.oreg].d[0] = fregs[rm.areg].d[0];
+            xregs[rm.oreg].d[0] = xregs[rm.areg].d[0];
             printf("MOVSD %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
         }
     } else if (oper) { // MOVUPD
@@ -45,12 +45,13 @@ void ASM_0F_10(Data *data) {
 
             STACK64F(temp,  fdisp);
             STACK64F(temp2, fdisp + 8);
-            fregs[rm.oreg].d[0] = *temp;
-            fregs[rm.oreg].d[1] = *temp2;
+            xregs[rm.oreg].d[0] = *temp;
+            xregs[rm.oreg].d[1] = *temp2;
 
             ASM_rmPrint("MOVUPD", &rm, data->disp, v_Reg, true);
         } else {
-            fregs[rm.oreg].xi = fregs[rm.areg].xi;
+            xregs[rm.oreg].d[0] = xregs[rm.areg].d[0];
+            xregs[rm.oreg].d[1] = xregs[rm.areg].d[1];
             printf("MOVUPD %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
         }
     } else if (sing) { // MOVSS
@@ -58,10 +59,10 @@ void ASM_0F_10(Data *data) {
             s64 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK32F(temp, fdisp);
-            fregs[rm.oreg].f[0] = *temp;
+            xregs[rm.oreg].f[0] = *temp;
             ASM_rmPrint("MOVSS", &rm, data->disp, v_Reg, true);
         } else {
-            fregs[rm.oreg].f[0] = fregs[rm.areg].f[0];
+            xregs[rm.oreg].f[0] = xregs[rm.areg].f[0];
             printf("MOVSS %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
         }
     } else { // MOVUPS
@@ -72,14 +73,14 @@ void ASM_0F_10(Data *data) {
             STACK32F(temp2, fdisp + 0x4);
             STACK32F(temp3, fdisp + 0x8);
             STACK32F(temp4, fdisp + 0xC);
-            fregs[rm.oreg].f[0] = *temp1;
-            fregs[rm.oreg].f[1] = *temp2;
-            fregs[rm.oreg].f[2] = *temp3;
-            fregs[rm.oreg].f[3] = *temp4;
+            xregs[rm.oreg].f[0] = *temp1;
+            xregs[rm.oreg].f[1] = *temp2;
+            xregs[rm.oreg].f[2] = *temp3;
+            xregs[rm.oreg].f[3] = *temp4;
 
             ASM_rmPrint("MOVUPS", &rm, data->disp, v_Reg, true);
         } else {
-            fregs[rm.oreg].xi = fregs[rm.areg].xi;
+            xregs[rm.oreg].xi = xregs[rm.areg].xi;
             printf("MOVUPS %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
         }
     }
@@ -104,10 +105,10 @@ void ASM_0F_11(Data *data) {
             s64 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK64F(temp, fdisp);
-            *temp = fregs[rm.oreg].d[0];
+            *temp = xregs[rm.oreg].d[0];
             ASM_rmPrint("MOVSD", &rm, data->disp, v_Reg, false);
         } else {
-            fregs[rm.areg].d[0] = fregs[rm.oreg].d[0];
+            xregs[rm.areg].d[0] = xregs[rm.oreg].d[0];
             printf("MOVSD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         }
     } else if (oper) { // MOVUPD
@@ -116,12 +117,12 @@ void ASM_0F_11(Data *data) {
 
             STACK64F(temp,  fdisp);
             STACK64F(temp2, fdisp + 8);
-            *temp  = fregs[rm.oreg].d[0];
-            *temp2 = fregs[rm.oreg].d[1];
+            *temp  = xregs[rm.oreg].d[0];
+            *temp2 = xregs[rm.oreg].d[1];
 
             ASM_rmPrint("MOVUPD", &rm, data->disp, v_Reg, false);
         } else {
-            fregs[rm.areg].xi = fregs[rm.oreg].xi;
+            xregs[rm.areg].xi = xregs[rm.oreg].xi;
             printf("MOVUPD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         }
     } else if (sing) { // MOVSS
@@ -129,10 +130,10 @@ void ASM_0F_11(Data *data) {
             s64 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK32F(temp, fdisp);
-            *temp = fregs[rm.oreg].f[0];
+            *temp = xregs[rm.oreg].f[0];
             ASM_rmPrint("MOVSS", &rm, data->disp, v_Reg, false);
         } else {
-            fregs[rm.areg].f[0] = fregs[rm.oreg].f[0];
+            xregs[rm.areg].f[0] = xregs[rm.oreg].f[0];
             printf("MOVSS %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         }
     } else { // MOVUPS
@@ -143,14 +144,14 @@ void ASM_0F_11(Data *data) {
             STACK32F(temp2, fdisp + 0x4);
             STACK32F(temp3, fdisp + 0x8);
             STACK32F(temp4, fdisp + 0xC);
-            *temp1 = fregs[rm.oreg].f[0];
-            *temp2 = fregs[rm.oreg].f[1];
-            *temp3 = fregs[rm.oreg].f[2];
-            *temp4 = fregs[rm.oreg].f[3];
+            *temp1 = xregs[rm.oreg].f[0];
+            *temp2 = xregs[rm.oreg].f[1];
+            *temp3 = xregs[rm.oreg].f[2];
+            *temp4 = xregs[rm.oreg].f[3];
 
             ASM_rmPrint("MOVUPS", &rm, data->disp, v_Reg, false);
         } else {
-            fregs[rm.areg].xi = fregs[rm.oreg].xi;
+            xregs[rm.areg].xi = xregs[rm.oreg].xi;
             printf("MOVUPS %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         }
     }
@@ -159,31 +160,41 @@ void ASM_0F_11(Data *data) {
     ASM_end();
 }
 
-// MOV(L)HPS xmm, mm/xmm
-// NOTE: MOVHPD and MOVSHDUP unimplemented
+// MOVLHPS xmm, xmm
+// MOVHPS xmm, m(64)
+// MOVHPD xmm m(64)
 void ASM_0F_16(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Float128);
     ASM_incIP(3, &rm);
 
-    if (rm.isPtr) { // MOVHPS
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+    s64 fdisp = ASM_getDisp(&rm, data->disp);
 
-        STACK64(temp, fdisp);
-        __m128 temp128 = _mm_castsi128_ps(fregs[rm.oreg].xi);
-        temp128 = _mm_loadh_pi(temp128, (const __m64 *)temp);
-        fregs[rm.oreg].xi = _mm_castps_si128(temp128);
+    if (oper) {
+        if (rm.isPtr) {
+            STACK64(temp, fdisp);
+            u128_set64(&xregs[rm.oreg].xi, *temp, xregs[rm.oreg].ul[0]);
 
-        rm.otype = R_Float128;
-        ASM_rmPrint("MOVHPS", &rm, data->disp, v_Reg, true);
-    } else { // MOVLHPS
-        __m128 src = _mm_castsi128_ps(fregs[rm.areg].xi);
-        __m128 dest = _mm_castsi128_ps(fregs[rm.oreg].xi);
-        dest = _mm_movelh_ps(dest, src);
-        fregs[rm.oreg].xi = _mm_castps_si128(dest);
+            rm.otype = R_Float128;
+            ASM_rmPrint("MOVHPD", &rm, data->disp, v_Reg, true);
+        } else {
+            printf("GENERAL PROTECTION FAULT: %.8X", (u32)fdisp);
+        }
+    } else if (sing) {
 
-        rm.atype = R_Float128;
-        rm.otype = R_Float128;
-        printf("MOVLHPS %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+    } else {
+        if (rm.isPtr) { // MOVHPS
+            STACK64(temp, fdisp);
+            u128_set64(&xregs[rm.oreg].xi, *temp, *(temp + 1));
+
+            rm.otype = R_Float128;
+            ASM_rmPrint("MOVHPS", &rm, data->disp, v_Reg, true);
+        } else { // MOVLHPS
+            u128_set64(&xregs[rm.oreg].xi, xregs[rm.areg].ul[1], xregs[rm.oreg].ul[0]);
+
+            rm.atype = R_Float128;
+            rm.otype = R_Float128;
+            printf("MOVLHPS %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
+        }
     }
 
     ASM_rexPrint();
@@ -219,21 +230,21 @@ void ASM_0F_28(Data *data) {
             STACK32F(temp2, fdisp + 0x4);
             STACK32F(temp3, fdisp + 0x8);
             STACK32F(temp4, fdisp + 0xC);
-            fregs[rm.oreg].f[0] = *temp1;
-            fregs[rm.oreg].f[1] = *temp2;
-            fregs[rm.oreg].f[2] = *temp3;
-            fregs[rm.oreg].f[3] = *temp4;
+            xregs[rm.oreg].f[0] = *temp1;
+            xregs[rm.oreg].f[1] = *temp2;
+            xregs[rm.oreg].f[2] = *temp3;
+            xregs[rm.oreg].f[3] = *temp4;
             ASM_rmPrint("MOVAPS", &rm, data->disp, v_Reg, true);
         } else {
             STACK64F(temp1, fdisp + 0x0);
             STACK64F(temp2, fdisp + 0x8);
-            fregs[rm.oreg].d[0] = *temp1;
-            fregs[rm.oreg].d[1] = *temp2;
+            xregs[rm.oreg].d[0] = *temp1;
+            xregs[rm.oreg].d[1] = *temp2;
             ASM_rmPrint("MOVAPD", &rm, data->disp, v_Reg, true);
         }
 
     } else {
-        fregs[rm.oreg].xi = fregs[rm.areg].xi;
+        xregs[rm.oreg].xi = xregs[rm.areg].xi;
         if (!oper)
             printf("MOVAPS %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
         else
@@ -268,21 +279,21 @@ void ASM_0F_29(Data *data) {
             STACK32F(temp2, fdisp + 0x4);
             STACK32F(temp3, fdisp + 0x8);
             STACK32F(temp4, fdisp + 0xC);
-            *temp1 = fregs[rm.oreg].f[0];
-            *temp2 = fregs[rm.oreg].f[1];
-            *temp3 = fregs[rm.oreg].f[2];
-            *temp4 = fregs[rm.oreg].f[3];
+            *temp1 = xregs[rm.oreg].f[0];
+            *temp2 = xregs[rm.oreg].f[1];
+            *temp3 = xregs[rm.oreg].f[2];
+            *temp4 = xregs[rm.oreg].f[3];
             ASM_rmPrint("MOVAPS", &rm, data->disp, v_Reg, false);
         } else {
             STACK64F(temp1, fdisp + 0x0);
             STACK64F(temp2, fdisp + 0x8);
-            *temp1 = fregs[rm.oreg].d[0];
-            *temp2 = fregs[rm.oreg].d[1];
+            *temp1 = xregs[rm.oreg].d[0];
+            *temp2 = xregs[rm.oreg].d[1];
             ASM_rmPrint("MOVAPD", &rm, data->disp, v_Reg, false);
         }
 
     } else {
-        fregs[rm.areg].xi = fregs[rm.oreg].xi;
+        xregs[rm.areg].xi = xregs[rm.oreg].xi;
         if (!oper)
             printf("MOVAPS %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         else
@@ -436,33 +447,32 @@ void ASM_0F_57(Data *data) {
             STACK32(temp2, fdisp + 0x4);
             STACK32(temp3, fdisp + 0x8);
             STACK32(temp4, fdisp + 0xC);
-            *temp1 ^= fregs[rm.oreg].u[0];
-            *temp2 ^= fregs[rm.oreg].u[1];
-            *temp3 ^= fregs[rm.oreg].u[2];
-            *temp4 ^= fregs[rm.oreg].u[3];
+            *temp1 ^= xregs[rm.oreg].u[0];
+            *temp2 ^= xregs[rm.oreg].u[1];
+            *temp3 ^= xregs[rm.oreg].u[2];
+            *temp4 ^= xregs[rm.oreg].u[3];
 
             ASM_rmPrint("XORPS", &rm, data->disp, v_Reg, false);
         } else {
             STACK64(temp1, fdisp + 0x0);
             STACK64(temp2, fdisp + 0x8);
-            *temp1 ^= fregs[rm.oreg].ul[0];
-            *temp2 ^= fregs[rm.oreg].ul[1];
+            *temp1 ^= xregs[rm.oreg].ul[0];
+            *temp2 ^= xregs[rm.oreg].ul[1];
 
             ASM_rmPrint("XORPD", &rm, data->disp, v_Reg, false);
         }
     } else {
-
         if (!oper) {
-            __m128 a = _mm_castsi128_ps(fregs[rm.areg].xi);
-            __m128 b = _mm_castsi128_ps(fregs[rm.oreg].xi);
-            a = _mm_xor_ps(a, b);
-            fregs[rm.areg].xi = _mm_castps_si128(a);
+            xregs[rm.areg].u[0] ^= xregs[rm.oreg].u[0];
+            xregs[rm.areg].u[1] ^= xregs[rm.oreg].u[1];
+            xregs[rm.areg].u[2] ^= xregs[rm.oreg].u[2];
+            xregs[rm.areg].u[3] ^= xregs[rm.oreg].u[3];
+            
             printf("XORPS %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         } else {
-            __m128d a = _mm_castsi128_pd(fregs[rm.areg].xi);
-            __m128d b = _mm_castsi128_pd(fregs[rm.oreg].xi);
-            a = _mm_xor_pd(a, b);
-            fregs[rm.areg].xi = _mm_castpd_si128(a);
+            xregs[rm.areg].ul[0] ^= xregs[rm.oreg].ul[0];
+            xregs[rm.areg].ul[1] ^= xregs[rm.oreg].ul[1];
+
             printf("XORPD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         }
     }
@@ -483,19 +493,19 @@ void ASM_0F_6E(Data *data) {
             case R_MMX: {
                 if (rm.atype == R_Bit32) {
                     STACK32(temp, fdisp);
-                    xregs[rm.oreg].u = *temp;
+                    mregs[rm.oreg].u = *temp;
                 } else {
                     STACK64(temp, fdisp);
-                    xregs[rm.oreg].u = *temp;
+                    mregs[rm.oreg].u = *temp;
                 }
             }
             case R_Float128: {
                 if (rm.atype == R_Bit32) {
                     STACK32(temp, fdisp);
-                    fregs[rm.oreg].xi = _mm_cvtsi32_si128(*temp);
+                    u128_set64(&xregs[rm.oreg].xi, 0, (u64)*temp);
                 } else {
                     STACK64(temp, fdisp);
-                    fregs[rm.oreg].xi = _mm_cvtsi64_si128(*temp);
+                    u128_set64(&xregs[rm.oreg].xi, 0, *temp);
                 }
             }
             default: break;
@@ -511,16 +521,16 @@ void ASM_0F_6E(Data *data) {
         switch (rm.otype) {
             case R_MMX:
                 if (rm.atype == R_Bit32) {
-                    xregs[rm.oreg].u = regs[rm.areg].e;
+                    mregs[rm.oreg].u = regs[rm.areg].e;
                 } else {
-                    xregs[rm.oreg].u = regs[rm.areg].r;
+                    mregs[rm.oreg].u = regs[rm.areg].r;
                 }
                 break;
             case R_Float128:
                 if (rm.atype == R_Bit32) {
-                    fregs[rm.oreg].xi = _mm_cvtsi32_si128(regs[rm.areg].e);
+                    u128_set64(&xregs[rm.oreg].xi, 0, (u64)regs[rm.areg].e);
                 } else {
-                    fregs[rm.oreg].xi = _mm_cvtsi64_si128(regs[rm.areg].r);
+                    u128_set64(&xregs[rm.oreg].xi, 0, regs[rm.areg].r);
                 }
                 break;
             default: break;
@@ -552,15 +562,15 @@ void ASM_0F_7E(Data *data) {
 
             s64 fdisp = ASM_getDisp(&rm, data->disp);
             STACK64F(temp, fdisp);
-            fregs[rm.oreg].d[0] = *temp;
-            fregs[rm.oreg].d[1] = 0.0;
+            xregs[rm.oreg].d[0] = *temp;
+            xregs[rm.oreg].d[1] = 0.0;
 
             ASM_rmPrint("MOVQ", &rm, data->disp, v_Reg, true);
         } else {
             rm.atype = R_Float128;
 
-            fregs[rm.oreg].d[0] = fregs[rm.areg].d[0];
-            fregs[rm.oreg].d[1] = 0;
+            xregs[rm.oreg].d[0] = xregs[rm.areg].d[0];
+            xregs[rm.oreg].d[1] = 0;
 
             printf("MOVQ %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
         }
@@ -572,19 +582,19 @@ void ASM_0F_7E(Data *data) {
 
             if (rex.w) {
                 STACK64(temp, fdisp);
-                *temp = fregs[rm.oreg].ul[0];
+                *temp = xregs[rm.oreg].ul[0];
                 ASM_rmPrint("MOVQ", &rm, data->disp, v_Reg, false);
             } else {
                 STACK32(temp, fdisp);
-                *temp = fregs[rm.oreg].u[0];
+                *temp = xregs[rm.oreg].u[0];
                 ASM_rmPrint("MOVD", &rm, data->disp, v_Reg, false);
             }
         } else {
             if (rex.w) {
-                regs[rm.areg].r = fregs[rm.oreg].ul[0];
+                regs[rm.areg].r = xregs[rm.oreg].ul[0];
                 printf("MOVQ %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
             } else {
-                regs[rm.areg].e = fregs[rm.oreg].u[0];
+                regs[rm.areg].e = xregs[rm.oreg].u[0];
                 regs[rm.areg].eh = 0;
                 printf("MOVD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
             }
@@ -598,19 +608,19 @@ void ASM_0F_7E(Data *data) {
 
             if (rex.w) {
                 STACK64(temp, fdisp);
-                *temp = xregs[rm.oreg].u;
+                *temp = mregs[rm.oreg].u;
                 ASM_rmPrint("MOVQ", &rm, data->disp, v_Reg, false);
             } else {
                 STACK32(temp, fdisp);
-                *temp = (u32)xregs[rm.oreg].u;
+                *temp = (u32)mregs[rm.oreg].u;
                 ASM_rmPrint("MOVD", &rm, data->disp, v_Reg, false);
             }
         } else {
             if (rex.w) {
-                regs[rm.areg].r = xregs[rm.oreg].u;
+                regs[rm.areg].r = mregs[rm.oreg].u;
                 printf("MOVQ %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
             } else {
-                regs[rm.areg].e = (u32)xregs[rm.oreg].u;
+                regs[rm.areg].e = (u32)mregs[rm.oreg].u;
                 regs[rm.areg].eh = 0;
                 printf("MOVD %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
             }
@@ -636,10 +646,10 @@ void ASM_0F_7F(Data *data) {
             s64 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK64F(temp, fdisp);
-            *temp = fregs[rm.oreg].d[0];
+            *temp = xregs[rm.oreg].d[0];
             ASM_rmPrint("MOVDQU", &rm, data->disp, v_Reg, false);
         } else {
-            fregs[rm.areg].d[0] = fregs[rm.oreg].d[0];
+            xregs[rm.areg].d[0] = xregs[rm.oreg].d[0];
             printf("MOVDQU %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         }
     } else if (oper) { // MOVDQA
@@ -651,10 +661,10 @@ void ASM_0F_7F(Data *data) {
         }
         if (rm.isPtr) {
             STACK64F(temp, fdisp);
-            *temp = fregs[rm.oreg].d[0];
+            *temp = xregs[rm.oreg].d[0];
             ASM_rmPrint("MOVDQA", &rm, data->disp, v_Reg, false);
         } else {
-            fregs[rm.areg].d[0] = fregs[rm.oreg].d[0];
+            xregs[rm.areg].d[0] = xregs[rm.oreg].d[0];
             printf("MOVDQA %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         }
     } else { // MOVQ
@@ -664,11 +674,11 @@ void ASM_0F_7F(Data *data) {
             s64 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK64(temp, fdisp);
-            *temp = xregs[rm.oreg].u;
+            *temp = mregs[rm.oreg].u;
             ASM_rmPrint("MOVQ", &rm, data->disp, v_Reg, false);
         } else {
             rm.atype = R_MMX;
-            xregs[rm.areg].u = xregs[rm.oreg].u;
+            mregs[rm.areg].u = mregs[rm.oreg].u;
             printf("MOVQ %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         }
     }
@@ -966,13 +976,26 @@ void ASM_0F_95(Data *data) {
     ASM_end();
 }
 
+void _ASM_call_cpuid(int *cpuInfo, u32 eax, u32 ecx) {
+#ifdef _WIN64
+    #include <intrin.h>
+    __cpuidex(cpuInfo, regs[0].e, regs[1].e);
+#else
+    __asm__ volatile(
+        "cpuid\n\t"
+            : "=a" (cpuInfo[0]), "=b" (cpuInfo[1]), "=c" (cpuInfo[2]), "=d" (cpuInfo[3])
+            : "a" (eax), "c" (ecx)
+    : );
+#endif
+}
+
 // CPUID
 void ASM_0F_A2(Data *data) {
     int cpuInfo[4];
 
     ASM_incIP(2, NULL);
 
-    __cpuidex(cpuInfo, regs[0].e, regs[1].e);
+    _ASM_call_cpuid(cpuInfo, regs[0].e, regs[1].e);
 
     regs[0].e = cpuInfo[0]; regs[0].eh = 0;
     regs[3].e = cpuInfo[1]; regs[3].eh = 0;
