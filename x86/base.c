@@ -5,7 +5,7 @@ Reg regs[17] = { 0 };
 // order: ss, cs, ds, es, fs, gs
 u16 sregs[6] = { 0 };
 XMMReg xregs[16] = { 0 };
-YMMReg yregs[16] = { 0 };
+// YMMReg yregs[16] = { 0 };
 MMXReg mregs[16] = { 0 };
 u64 stregs[8] = { 0 };
 Flags f = {0, .f.on = 1 };
@@ -34,12 +34,12 @@ void ASM_init() {
         xregs[i].xi.low = 0;
         xregs[i].xi.high = 0;
     }
-    for (int i = 0; i < 16; i++) {
-        yregs[i].xi[0].low = 0;
-        yregs[i].xi[0].high = 0;
-        yregs[i].xi[1].low = 0;
-        yregs[i].xi[1].high = 0;
-    }
+    // for (int i = 0; i < 16; i++) {
+    //     yregs[i].xi[0].low = 0;
+    //     yregs[i].xi[0].high = 0;
+    //     yregs[i].xi[1].low = 0;
+    //     yregs[i].xi[1].high = 0;
+    // }
 }
 
 void ASM_getSIB(RM *rm, u8 sib) {

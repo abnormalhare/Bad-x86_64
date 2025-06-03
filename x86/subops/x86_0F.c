@@ -304,11 +304,26 @@ void ASM_0F_29(Data *data) {
     ASM_end();
 }
 
+u64 _ASM_call___rdtsc(void) {
+#ifdef _WIN64
+    return __rdtsc();
+#else
+    int edx, eax;
+
+    __asm__ volatile (
+        "rdtsc\n\t"
+            : "=d" (edx), "=a" (eax)
+    : );
+
+    return ((u64)edx << 32) + eax;
+#endif
+}
+
 void ASM_0F_31(Data *data) {
     ASM_incIP(2, NULL);
 
     Reg temp;
-    temp.r = __rdtsc();
+    temp.r = _ASM_call___rdtsc();
 
     regs[2].e = temp.eh; regs[2].eh = 0;
     regs[0].e = temp.e;  regs[0].eh = 0;
@@ -978,7 +993,6 @@ void ASM_0F_95(Data *data) {
 
 void _ASM_call_cpuid(int *cpuInfo, u32 eax, u32 ecx) {
 #ifdef _WIN64
-    #include <intrin.h>
     __cpuidex(cpuInfo, regs[0].e, regs[1].e);
 #else
     __asm__ volatile(

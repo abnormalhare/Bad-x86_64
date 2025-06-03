@@ -7,6 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef _WIN64
+#include <windows.h>
+#include <intrin.h>
+#endif
+
 typedef int8_t s8;
 typedef uint8_t u8;
 typedef int16_t s16;
