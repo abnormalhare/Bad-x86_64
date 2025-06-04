@@ -9,7 +9,7 @@ void ASM_01(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; *temp += regs[rm.oreg].x; break; }
@@ -50,7 +50,7 @@ void ASM_03(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; regs[rm.oreg].x += *temp; break; }
@@ -93,7 +93,7 @@ void ASM_0B(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; regs[rm.oreg].x |= *temp; break; }
@@ -171,7 +171,7 @@ void ASM_23(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
     
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; regs[rm.oreg].x &= *temp; break; }
@@ -218,7 +218,7 @@ void ASM_2B(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; regs[rm.oreg].x -= *temp; break; }
@@ -261,7 +261,7 @@ void ASM_31(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
     
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; *temp ^= regs[rm.oreg].x; break; }
@@ -308,7 +308,7 @@ void ASM_32(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         STACK8(temp, fdisp);
         if (rm.otype == R_Bit8H) {
@@ -356,7 +356,7 @@ void ASM_33(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
     
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; regs[rm.oreg].x ^= *temp; break; }
@@ -405,7 +405,7 @@ void ASM_38(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         STACK8(temp, fdisp);
         if (rm.otype == R_Bit8H) {
@@ -443,7 +443,7 @@ void ASM_39(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
     
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; break; }
@@ -484,7 +484,7 @@ void ASM_3B(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
     
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; break; }
@@ -599,7 +599,7 @@ void ASM_63(u8 rm_code, u8 sib, s32 disp) {
     ASM_incIP(2, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16:
@@ -888,7 +888,7 @@ void ASM_84(u8 rm_code, u8 sib, s32 disp) {
     Reg res = { 0 };
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         STACK8(temp, fdisp);
         if (rm.otype == R_Bit8H) {
@@ -926,7 +926,7 @@ void ASM_85(u8 rm_code, u8 sib, s32 disp) {
     ASM_incIP(2, &rm);
     
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; break; }
@@ -967,7 +967,7 @@ void ASM_88(u8 rm_code, u8 sib, s32 disp) {
     ASM_incIP(2, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         STACK8(temp, fdisp);
         *temp = (rm.otype == R_Bit8H) ? regs[rm.oreg].h : regs[rm.oreg].l;
@@ -993,7 +993,7 @@ void ASM_89(u8 rm_code, u8 sib, s32 disp) {
     ASM_incIP(2, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); *temp = regs[rm.oreg].x; break; }
@@ -1023,7 +1023,7 @@ void ASM_8A(u8 rm_code, u8 sib, s32 disp) {
     ASM_incIP(2, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         STACK8(temp, fdisp);
         if (rm.otype == R_Bit8H) {
@@ -1053,7 +1053,7 @@ void ASM_8B(u8 rm_code, u8 sib, s32 disp) {
     ASM_incIP(2, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); regs[rm.oreg].x = *temp; break; }
@@ -1083,7 +1083,7 @@ void ASM_8D(u8 rm_code, u8 sib, s32 disp) {
     ASM_incIP(2, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { regs[rm.oreg].x = fdisp; break; }
@@ -1223,7 +1223,7 @@ void ASM_C6(u8 rm_code, u8 sib, s32 disp, u8 val) {
     ASM_incIP(3, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         STACK8(temp, fdisp);
         *temp = val;
@@ -1251,7 +1251,7 @@ void ASM_C7(u8 rm_code, u8 sib, s32 disp, u32 val) {
     ASM_incIP((rm.otype == R_Bit16) ? 4 : 6, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, disp);
+        u32 fdisp = ASM_getDisp(&rm, disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); *temp = (u16)val; break; }

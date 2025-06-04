@@ -2,7 +2,7 @@
 
 void ASM_F7NOT(RM *rm, s32 disp, u8 val) {
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->otype) {
             case R_Bit16: { STACK16(temp, fdisp); *temp = ~*temp; break; }
@@ -28,7 +28,7 @@ void ASM_F7NOT(RM *rm, s32 disp, u8 val) {
 
 void ASM_F7NEG(RM *rm, s32 disp, u8 val) {
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->otype) {
             case R_Bit16: { STACK16(temp, fdisp); *temp = -*temp; break; }

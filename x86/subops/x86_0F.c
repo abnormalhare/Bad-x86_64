@@ -30,7 +30,7 @@ void ASM_0F_10(Data *data) {
 
     if (doub) { // MOVSD
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK64F(temp, fdisp);
             xregs[rm.oreg].d[0] = *temp;
@@ -41,7 +41,7 @@ void ASM_0F_10(Data *data) {
         }
     } else if (oper) { // MOVUPD
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK64F(temp,  fdisp);
             STACK64F(temp2, fdisp + 8);
@@ -56,7 +56,7 @@ void ASM_0F_10(Data *data) {
         }
     } else if (sing) { // MOVSS
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK32F(temp, fdisp);
             xregs[rm.oreg].f[0] = *temp;
@@ -67,7 +67,7 @@ void ASM_0F_10(Data *data) {
         }
     } else { // MOVUPS
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK32F(temp1, fdisp + 0x0);
             STACK32F(temp2, fdisp + 0x4);
@@ -102,7 +102,7 @@ void ASM_0F_11(Data *data) {
 
     if (doub) { // MOVSD
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK64F(temp, fdisp);
             *temp = xregs[rm.oreg].d[0];
@@ -113,7 +113,7 @@ void ASM_0F_11(Data *data) {
         }
     } else if (oper) { // MOVUPD
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK64F(temp,  fdisp);
             STACK64F(temp2, fdisp + 8);
@@ -127,7 +127,7 @@ void ASM_0F_11(Data *data) {
         }
     } else if (sing) { // MOVSS
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK32F(temp, fdisp);
             *temp = xregs[rm.oreg].f[0];
@@ -138,7 +138,7 @@ void ASM_0F_11(Data *data) {
         }
     } else { // MOVUPS
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK32F(temp1, fdisp + 0x0);
             STACK32F(temp2, fdisp + 0x4);
@@ -167,7 +167,7 @@ void ASM_0F_16(Data *data) {
     RM rm = ASM_getRM(data->rm_code, data->sib, R_Float128);
     ASM_incIP(3, &rm);
 
-    s64 fdisp = ASM_getDisp(&rm, data->disp);
+    u32 fdisp = ASM_getDisp(&rm, data->disp);
 
     if (oper) {
         if (rm.isPtr) {
@@ -216,7 +216,7 @@ void ASM_0F_28(Data *data) {
     rm.otype = R_Float128;
     if (!rm.isPtr) rm.atype = R_Float128;
 
-    s64 fdisp = ASM_getDisp(&rm, data->disp);
+    u32 fdisp = ASM_getDisp(&rm, data->disp);
 
     // check if aligned
     if (((fdisp) / 4) * 4 != fdisp) {
@@ -264,7 +264,7 @@ void ASM_0F_29(Data *data) {
     rm.otype = R_Float128;
     if (!rm.isPtr) rm.atype = R_Float128;
 
-    s64 fdisp = ASM_getDisp(&rm, data->disp);
+    u32 fdisp = ASM_getDisp(&rm, data->disp);
 
     // check if aligned
     if (((fdisp) / 4) * 4 != fdisp) {
@@ -339,7 +339,7 @@ void ASM_0F_43(Data *data) {
     ASM_incIP(3, &rm);
     
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         if (f.f.cf) {
             switch (rm.otype) {
@@ -377,7 +377,7 @@ void ASM_0F_44(Data *data) {
     ASM_incIP(3, &rm);
     
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         if (f.f.zf) {
             switch (rm.otype) {
@@ -415,7 +415,7 @@ void ASM_0F_45(Data *data) {
     ASM_incIP(2, &rm);
     
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         if (!f.f.zf) {
             switch (rm.otype) {
@@ -455,7 +455,7 @@ void ASM_0F_57(Data *data) {
     if (!rm.isPtr) rm.atype = R_Float128;
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         if (!oper) {
             STACK32(temp1, fdisp + 0x0);
@@ -502,7 +502,7 @@ void ASM_0F_6E(Data *data) {
     ASM_incIP(3, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         switch (rm.otype) {
             case R_MMX: {
@@ -575,7 +575,7 @@ void ASM_0F_7E(Data *data) {
         if (rm.isPtr) {
             rm.atype = R_Bit32;
 
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
             STACK64F(temp, fdisp);
             xregs[rm.oreg].d[0] = *temp;
             xregs[rm.oreg].d[1] = 0.0;
@@ -593,7 +593,7 @@ void ASM_0F_7E(Data *data) {
         rm.atype = IS_W(R_Bit32, R_Bit64);
 
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             if (rex.w) {
                 STACK64(temp, fdisp);
@@ -619,7 +619,7 @@ void ASM_0F_7E(Data *data) {
         rm.atype = IS_W(R_Bit32, R_Bit64);
 
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             if (rex.w) {
                 STACK64(temp, fdisp);
@@ -658,7 +658,7 @@ void ASM_0F_7F(Data *data) {
 
     if (sing) { // MOVDQU
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK64F(temp, fdisp);
             *temp = xregs[rm.oreg].d[0];
@@ -668,7 +668,7 @@ void ASM_0F_7F(Data *data) {
             printf("MOVDQU %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
         }
     } else if (oper) { // MOVDQA
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         if ((fdisp) / 4 * 4 != fdisp) {
             printf("GENERAL PROTECTION FAULT: %.8X", (u32)fdisp);
@@ -686,7 +686,7 @@ void ASM_0F_7F(Data *data) {
         rm.otype = R_MMX;
 
         if (rm.isPtr) {
-            s64 fdisp = ASM_getDisp(&rm, data->disp);
+            u32 fdisp = ASM_getDisp(&rm, data->disp);
 
             STACK64(temp, fdisp);
             *temp = mregs[rm.oreg].u;
@@ -971,7 +971,7 @@ void ASM_0F_95(Data *data) {
     ASM_incIP(2, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         STACK8(temp, fdisp);
         *temp = (!f.f.zf);
@@ -1031,7 +1031,7 @@ void ASM_0F_AF(Data *data) {
     s64 val = 0;
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         switch (rm.otype) {
             case R_Bit16: {
@@ -1099,7 +1099,7 @@ void ASM_0F_B1(Data *data) {
     Reg res = { 0 };
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         switch (rm.otype) {
             case R_Bit16: {
@@ -1167,7 +1167,7 @@ void ASM_0F_B6(Data *data) {
     RegType type = (rex.enable != 0 && rm.oreg >= 4 && rm.oreg < 8) ? R_Bit8H : R_Bit8;
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         if (type == R_Bit8) {
             switch (rm.otype) {
@@ -1217,7 +1217,7 @@ void ASM_0F_B7(Data *data) {
     ASM_incIP(3, &rm);
 
     if (rm.isPtr) {
-        s64 fdisp = ASM_getDisp(&rm, data->disp);
+        u32 fdisp = ASM_getDisp(&rm, data->disp);
 
         switch (rm.otype) {
             case R_Bit16: { STACK16(temp, fdisp); regs[rm.oreg].x = *temp; break; }

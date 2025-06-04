@@ -5,8 +5,23 @@ void ASM_D1SHR(RM *rm, s32 disp) {
     Reg res = { 0 };
     
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
 
+        switch (rm->otype) {
+            case R_Bit16: {
+                STACK16(temp, fdisp);
+                prev.x = *temp; *temp >>= 1;
+                break;
+            } case R_Bit32: {
+                STACK32(temp, fdisp);
+                prev.x = *temp; *temp >>= 1;
+                break;
+            } case R_Bit64: {
+                STACK64(temp, fdisp);
+                prev.x = *temp; *temp >>= 1;
+                break;
+            } default: break;
+        }
         STACK8(temp, fdisp); prev.l = *temp; *temp >>= 1;
 
         rm->val = 1;
@@ -14,11 +29,14 @@ void ASM_D1SHR(RM *rm, s32 disp) {
         ASM_rmPrint("SHR", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
-            case R_Bit8:
-                prev.l = regs[rm->areg].l; regs[rm->areg].l >>= 1;
+            case R_Bit16:
+                prev.x = regs[rm->areg].x; regs[rm->areg].x >>= 1;
                 break;
-            case R_Bit8H:
-                prev.l = regs[rm->areg].h; regs[rm->areg].h >>= 1;
+            case R_Bit32:
+                prev.e = regs[rm->areg].e; regs[rm->areg].e >>= 1;
+                break;
+            case R_Bit64:
+                prev.r = regs[rm->areg].r; regs[rm->areg].r >>= 1;
                 break;
             default: break;
         }

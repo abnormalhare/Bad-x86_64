@@ -5,7 +5,7 @@ void ASM_81ADD(RM *rm, s32 disp, u32 val) {
     Reg res = { 0 };
     
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; *temp += val; break; }
@@ -54,7 +54,7 @@ void ASM_81AND(RM *rm, s32 disp, u32 val) {
     Reg res = { 0 };
     
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
 
         switch (rm->otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; *temp &= val; break; }
@@ -109,7 +109,7 @@ void ASM_81SUB(RM *rm, s32 disp, u32 val) {
     Reg res = { 0 };
     
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
 
         switch (rm->otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; *temp -= val; break; }
@@ -158,7 +158,7 @@ void ASM_81CMP(RM *rm, s32 disp, u32 val) {
     Reg res = { 0 };
     
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
 
         switch (rm->otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; break; }

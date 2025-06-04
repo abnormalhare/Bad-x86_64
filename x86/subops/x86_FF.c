@@ -7,7 +7,7 @@ void ASM_FFINC(RM *rm, s32 disp) {
     ASM_incIP(2, rm);
 
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = (*temp)++; break; }
@@ -43,7 +43,7 @@ void ASM_FFDEC(RM *rm, s32 disp) {
     ASM_incIP(2, rm);
 
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->otype) {
             case R_Bit16: { STACK16(temp, fdisp); prev.x = (*temp)--; break; }
@@ -82,7 +82,7 @@ void ASM_FFCALL(RM *rm, s32 disp) {
     *temp = regs[16].e;
     
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->atype) {
             case R_Bit16: { regs[16].x = fdisp; break; }
@@ -119,7 +119,7 @@ void ASM_FFJMP(RM *rm, s32 disp) {
     ASM_incIP(2, rm);
     
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->atype) {
             case R_Bit16: { regs[16].x = fdisp; break; }

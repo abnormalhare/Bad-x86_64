@@ -177,7 +177,7 @@ u64 ASM_getReg(u8 index, RegType type) {
     return reg;
 }
 
-s64 ASM_getDisp(RM *rm, s32 disp) {
+u32 ASM_getDisp(RM *rm, s32 disp) {
     if (rm->disp == 1) disp = (s8)disp;
 
     if (rm->areg == REG_NULL && rm->breg == REG_NULL) {
@@ -187,7 +187,7 @@ s64 ASM_getDisp(RM *rm, s32 disp) {
     } else if (rm->breg == REG_NULL) {
         return ASM_getReg(rm->areg, rm->atype) * rm->mul + disp;
     } else {
-        return ASM_getReg(rm->areg, rm->atype) * rm->mul + rm->breg + disp;
+        return ASM_getReg(rm->areg, rm->atype) * rm->mul + ASM_getReg(rm->breg, rm->btype) + disp;
     }
 }
 
@@ -380,7 +380,7 @@ void ASM_rexPrint(void) {
                 stack[sp], stack[sp + 1], stack[sp + 2], stack[sp + 3], stack[sp + 4], stack[sp + 5], stack[sp + 6], stack[sp + 7]);
     else printf("\n");
     
-    printf("  |BP:%.8X|8:%.16llX 9:%.16llX 10:%.16llX 11:%.16llX|XMM0H:%.8X%.8X| F:%d%d%d%d%d%d%d%d :", regs[5].e, regs[8].r, regs[9].r, regs[10].r, regs[11].r, xregs[1].u[0], xregs[1].u[1], f.f.of, f.f.df, f.f.iF, f.f.sf, f.f.zf, f.f.af, f.f.pf, f.f.cf);
+    printf("  | F:%d%d%d%d%d%d%d%d|8:%.16llX 9:%.16llX 10:%.16llX 11:%.16llX|XMM0H:%.8X%.8X|BP:%.8X :", f.f.of, f.f.df, f.f.iF, f.f.sf, f.f.zf, f.f.af, f.f.pf, f.f.cf, regs[8].r, regs[9].r, regs[10].r, regs[11].r, xregs[1].u[0], xregs[1].u[1], regs[5].e);
 
     sp = regs[4].e + 8;
     if (sp < 0x80000000)

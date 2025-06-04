@@ -8,7 +8,7 @@ void ASM_80OR(RM *rm, s32 disp, u8 val) {
     s8 sval = (s8)val;
     
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
         
         STACK8(temp, fdisp);
         prev.l = *temp;
@@ -47,7 +47,7 @@ void ASM_80AND(RM *rm, s32 disp, u8 val) {
     s8 sval = (s8)val;
     
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
         
         STACK8(temp, fdisp);
         prev.l = *temp;
@@ -85,7 +85,7 @@ void ASM_80CMP(RM *rm, s32 disp, u8 val) {
     s8 sval = val;
     
     if (rm->isPtr) {
-        s64 fdisp = ASM_getDisp(rm, disp);
+        u32 fdisp = ASM_getDisp(rm, disp);
 
         STACK8(temp, fdisp);
         prev.l = *temp;

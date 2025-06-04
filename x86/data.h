@@ -278,7 +278,7 @@ RM ASM_getRM(u8 rm, u8 sib, RegType type);
 ASM_codeFunc ASM_getFunc(u64 ip);
 ASM_codeFunc ASM_getCurrFunc(void);
 u64 ASM_getReg(u8 index, RegType type);
-s64 ASM_getDisp(RM *rm, s32 disp);
+u32 ASM_getDisp(RM *rm, s32 disp);
 void ASM_incIP(u32 num, RM *rm);
 void ASM_setFlags(Reg *prev, Reg *res, RegType type, bool borrow);
 char *ASM_getRegName(u8 index, RegType type);
