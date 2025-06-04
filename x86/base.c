@@ -372,7 +372,9 @@ const char *ASM_ptrName(RegType bits) {
 }
 
 void ASM_rexPrint(void) {
-    printf("\n  |IP:%.8X|A:%.16llX C:%.16llX  D:%.16llX  B:%.16llX|XMM0L:%.8X%.8X|SP:%.8X :", regs[16].e, regs[0].r, regs[1].r, regs[2].r, regs[3].r, xregs[0].u[0], xregs[0].u[1], regs[4].e);
+    printf("\n  |IP:%.8X|A:%.16llX C:%.16llX  D:%.16llX  B:%.16llX  S:%.16llX  D:%.16llX|XMM0: %.16llX %.16llX|SP:%.8X :",
+        regs[16].e, regs[0].r, regs[1].r, regs[2].r, regs[3].r, regs[6].r, regs[7].r, xregs[0].ul[0], xregs[0].ul[1], regs[4].e
+    );
     
     int sp = regs[4].e;
     if (sp < 0x80000000)
@@ -380,7 +382,10 @@ void ASM_rexPrint(void) {
                 stack[sp], stack[sp + 1], stack[sp + 2], stack[sp + 3], stack[sp + 4], stack[sp + 5], stack[sp + 6], stack[sp + 7]);
     else printf("\n");
     
-    printf("  | F:%d%d%d%d%d%d%d%d|8:%.16llX 9:%.16llX 10:%.16llX 11:%.16llX|XMM0H:%.8X%.8X|BP:%.8X :", f.f.of, f.f.df, f.f.iF, f.f.sf, f.f.zf, f.f.af, f.f.pf, f.f.cf, regs[8].r, regs[9].r, regs[10].r, regs[11].r, xregs[1].u[0], xregs[1].u[1], regs[5].e);
+    printf("  | F:%d%d%d%d%d%d%d%d|8:%.16llX 9:%.16llX 10:%.16llX 11:%.16llX 12:%.16llX 13:%.16llX 14:%.16llX 15:%.16llX|BP:%.8X :",
+        f.f.of, f.f.df, f.f.iF, f.f.sf, f.f.zf, f.f.af, f.f.pf, f.f.cf,
+        regs[8].r, regs[9].r, regs[10].r, regs[11].r, regs[12].r, regs[13].r, regs[14].r, regs[15].r, regs[5].e
+    );
 
     sp = regs[4].e + 8;
     if (sp < 0x80000000)
