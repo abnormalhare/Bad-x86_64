@@ -911,7 +911,7 @@ void ASM_38(u8 rm_code, u8 sib, s32 disp) {
 }
 
 // CMP r/m(16-64), r(16-64)
-void ASM_31(u8 rm_code, u8 sib, s32 disp) {
+void ASM_39(u8 rm_code, u8 sib, s32 disp) {
     RM *rm; u32 fdisp = ASM_setupOp(rm, rm_code, sib, disp, R_Bit32);
 
     switch (rm->otype) {
@@ -932,7 +932,7 @@ void ASM_31(u8 rm_code, u8 sib, s32 disp) {
 }
 
 // CMP r(8), r/m(8)
-void ASM_32(u8 rm_code, u8 sib, s32 disp) {
+void ASM_3A(u8 rm_code, u8 sib, s32 disp) {
     RM *rm; u32 fdisp = ASM_setupOp(rm, rm_code, sib, disp, R_Bit8);
 
     ASM_CMP_u8(rm, fdisp, true);
@@ -948,7 +948,7 @@ void ASM_32(u8 rm_code, u8 sib, s32 disp) {
 }
 
 // CMP r(16-64), r/m(16-64)
-void ASM_33(u8 rm_code, u8 sib, s32 disp) {
+void ASM_3B(u8 rm_code, u8 sib, s32 disp) {
     RM *rm; u32 fdisp = ASM_setupOp(rm, rm_code, sib, disp, R_Bit32);
 
     switch (rm->otype) {
@@ -969,7 +969,7 @@ void ASM_33(u8 rm_code, u8 sib, s32 disp) {
 }
 
 // CMP al, imm(8)
-void ASM_34(u8 imm) {
+void ASM_3C(u8 imm) {
     ASM_incIP(2, NULL);
     
     u8 a = 0; u8 b = 0; u8 res = 0;
@@ -984,7 +984,7 @@ void ASM_34(u8 imm) {
 }
 
 // CMP r/e/ax, imm(16-32)
-void ASM_35(u32 imm) {
+void ASM_3D(u32 imm) {
     if (oper) { ASM_incIP(4, NULL);
         if (imm > UINT16_MAX) {
             printf("ERROR: Improper immediate size");
@@ -1016,155 +1016,9 @@ void ASM_35(u32 imm) {
     ASM_end();
 }
 
-// CMP r/m(8), r(8)
-void ASM_38(u8 rm_code, u8 sib, s32 disp) {
-    RM rm = ASM_getRM(rm_code, sib, R_Bit8);
-    ASM_incIP(2, &rm);
-    
-    Reg prev = { 0 };
-    Reg res = { 0 };
-
-    if (rm.isPtr) {
-        u32 fdisp = ASM_getDisp(&rm, disp);
-
-        STACK8(temp, fdisp);
-        if (rm.otype == R_Bit8H) {
-            prev.l = regs[rm.oreg].h;
-        } else {
-            prev.l = regs[rm.oreg].l;
-        }
-        res.l = *temp - prev.l;
-        prev.l = *temp;
-
-        ASM_rmPrint("CMP", &rm, disp, v_Reg, false);
-    } else {
-        if (rm.otype == R_Bit8H) {
-            prev.l = regs[rm.oreg].h;
-        } else {
-            prev.l = regs[rm.oreg].l;
-        }
-        res.l = regs[rm.areg].l - prev.l;
-        prev.l = regs[rm.areg].l;
-        
-        printf("CMP %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
-    }
-    
-    ASM_setFlags(&prev, &res, rm.otype, true);
-    ASM_rexPrint();
-    ASM_end();
-}
-
-// CMP r/m(16-64), r(16-64)
-void ASM_39(u8 rm_code, u8 sib, s32 disp) {
-    RM rm = ASM_getRM(rm_code, sib, R_Bit32);
-    ASM_incIP(2, &rm);
-
-    Reg prev = { 0 };
-    Reg res = { 0 };
-    
-    if (rm.isPtr) {
-        u32 fdisp = ASM_getDisp(&rm, disp);
-
-        switch (rm.otype) {
-            case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; break; }
-            case R_Bit32: { STACK32(temp, fdisp); prev.e = *temp; break; }
-            case R_Bit64: { STACK64(temp, fdisp); prev.r = *temp; break; }
-            default: break;
-        }
-
-        ASM_rmPrint("CMP", &rm, disp, v_Reg, false);
-    } else {
-        switch (rm.otype) {
-            case R_Bit16: prev.x = regs[rm.areg].x; break;
-            case R_Bit32: prev.e = regs[rm.areg].e; break;
-            case R_Bit64: prev.r = regs[rm.areg].r; break;
-            default: break;
-        }
-        printf("CMP %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
-    }
-
-    switch (rm.otype) {
-        case R_Bit16: res.x = prev.x - regs[rm.oreg].x; break;
-        case R_Bit32: res.e = prev.e - regs[rm.oreg].e; break;
-        case R_Bit64: res.r = prev.r - regs[rm.oreg].r; break;
-        default: break;
-    }
-
-    ASM_setFlags(&prev, &res, rm.otype, true);
-    ASM_rexPrint();
-    ASM_end();
-}
-
-// CMP r(16-64), r/m(16-64)
-void ASM_3B(u8 rm_code, u8 sib, s32 disp) {
-    RM rm = ASM_getRM(rm_code, sib, R_Bit32);
-    ASM_incIP(2, &rm);
-
-    Reg prev = { 0 };
-    Reg res = { 0 };
-    
-    if (rm.isPtr) {
-        u32 fdisp = ASM_getDisp(&rm, disp);
-
-        switch (rm.otype) {
-            case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; break; }
-            case R_Bit32: { STACK32(temp, fdisp); prev.e = *temp; break; }
-            case R_Bit64: { STACK64(temp, fdisp); prev.r = *temp; break; }
-            default: break;
-        }
-
-        ASM_rmPrint("CMP", &rm, disp, v_Reg, true);
-    } else {
-        switch (rm.otype) {
-            case R_Bit16: prev.x = regs[rm.areg].x; break;
-            case R_Bit32: prev.e = regs[rm.areg].e; break;
-            case R_Bit64: prev.r = regs[rm.areg].r; break;
-            default: break;
-        }
-        printf("CMP %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
-    }
-
-    switch (rm.otype) {
-        case R_Bit16: res.x = regs[rm.oreg].x - prev.x; prev.x = regs[rm.oreg].x; break;
-        case R_Bit32: res.e = regs[rm.oreg].e - prev.e; prev.e = regs[rm.oreg].e; break;
-        case R_Bit64: res.r = regs[rm.oreg].r - prev.r; prev.r = regs[rm.oreg].r; break;
-        default: break;
-    }
-
-    ASM_setFlags(&prev, &res, rm.otype, true);
-    ASM_rexPrint();
-    ASM_end();
-}
-
-void ASM_3D(s32 val) {
-    RegType type = IS_OP(IS_W(R_Bit32, R_Bit64), R_Bit16);
-    Reg res = {0};
-
-    switch (type) {
-        case R_Bit16:
-            ASM_incIP(4, NULL);
-            val = (s16)(u32)val;
-            res.x = regs[0].x - val;
-            break;
-        case R_Bit32:
-            ASM_incIP(5, NULL);
-            res.e = regs[0].e - val;
-            break;
-        case R_Bit64:
-            ASM_incIP(6, NULL);
-            res.r = regs[0].r - val;
-            break;
-
-        default: break;
-
-    }
-
-    if (type != R_Bit16) printf("CMP %s, 0x%.8X", ASM_getRegName(0, type), val);
-    else                 printf("CMP %s, 0x%.4X", ASM_getRegName(0, type), val);
-
-    ASM_setFlags(&regs[0], &res, type, true);
-    ASM_rexPrint();
-    ASM_end();
+// NULL
+void ASM_3E(void) {
+    null = true;
 }
 
 // 0x3F invalid
@@ -1181,9 +1035,9 @@ void ASM_5L(u8 in) {
     u8 reg = in % 8;
 
     regs[4].r -= IS_OP(8, 2);
-    STACK64(temp, regs[4].e);
+    STACK(u64, s, regs[4].e);
 
-    *temp = IS_B(IS_OP(regs[reg].r, regs[reg].x), IS_OP(regs[reg + 8].r, regs[reg + 8].x));
+    *s = IS_B(IS_OP(regs[reg].r, regs[reg].x), IS_OP(regs[reg + 8].r, regs[reg + 8].x));
 
     printf("PUSH %s", ASM_getRegName(IS_B(reg, reg + 8), IS_OP(R_Bit64, R_Bit16)));
     ASM_rexPrint();
@@ -1197,13 +1051,13 @@ void ASM_5H(u8 in) {
     u8 reg = in % 8;
     reg = IS_B(reg, reg + 8);
 
-    STACK64(temp, regs[4].e);
+    STACK(u64, s, regs[4].e);
     regs[4].r += IS_OP(8, 2);
 
     if (!oper) {
-        regs[reg].r = *temp;
+        regs[reg].r = *s;
     } else {
-        regs[reg].x = *temp;
+        regs[reg].x = *s;
     }
 
     printf("POP %s", ASM_getRegName(reg, IS_OP(R_Bit64, R_Bit16)));
@@ -1223,8 +1077,8 @@ void ASM_63(u8 rm_code, u8 sib, s32 disp) {
 
         switch (rm.otype) {
             case R_Bit16:
-            case R_Bit32: { STACK32(temp, fdisp); regs[rm.oreg].e = *temp; regs[rm.oreg].eh = 0; break; }
-            case R_Bit64: { STACK32(temp, fdisp); regs[rm.oreg].r = *temp; break; }
+            case R_Bit32: { STACK(u32, s, fdisp); regs[rm.oreg].e = *s; regs[rm.oreg].eh = 0; break; }
+            case R_Bit64: { STACK(u32, s, fdisp); regs[rm.oreg].r = *s; break; }
             default: break;
         }
 
