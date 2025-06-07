@@ -38,6 +38,16 @@ void ASM_XOR_u16(RM *rm, u32 disp, bool flip);
 void ASM_XOR_u32(RM *rm, u32 disp, bool flip);
 void ASM_XOR_u64(RM *rm, u32 disp, bool flip);
 
+void ASM_TEST_u8 (RM *rm, u32 disp, bool flip);
+void ASM_TEST_u16(RM *rm, u32 disp, bool flip);
+void ASM_TEST_u32(RM *rm, u32 disp, bool flip);
+void ASM_TEST_u64(RM *rm, u32 disp, bool flip);
+
+void ASM_MOV_u8 (RM *rm, u32 disp, bool flip);
+void ASM_MOV_u16(RM *rm, u32 disp, bool flip);
+void ASM_MOV_u32(RM *rm, u32 disp, bool flip);
+void ASM_MOV_u64(RM *rm, u32 disp, bool flip);
+
 #define ASM_ADD_FLAGS(t, a, b, res)         \
     f.f.cf = res < a;                       \
     f.f.pf = ASM_getParity(res);            \
