@@ -36,6 +36,14 @@ void ASM_AND_u64(RM *rm, u32 disp, bool flip);
     f.f.sf = (res & ((u##t)INT##t##_MAX + 1)) != 0; \
     f.f.of = ((~(a ^ b)) & (a ^ res) & ((u##t)INT##t##_MAX + 1)) != 0
 
+#define ASM_ADC_FLAGS(t, a, b, res)         \
+    f.f.cf = res < a + f.f.cf;              \
+    f.f.pf = ASM_getParity(res);            \
+    f.f.af = ((a ^ b ^ res) & 0x10) != 0;   \
+    f.f.zf = (res == 0);                    \
+    f.f.sf = (res & ((u##t)INT##t##_MAX + 1)) != 0; \
+    f.f.of = ((~(a ^ b)) & (a ^ res) & ((u##t)INT##t##_MAX + 1)) != 0
+
 #define ASM_BIT_FLAGS(t, a, b, res)         \
     f.f.cf = 0;                             \
     f.f.pf = ASM_getParity(res);            \
@@ -45,6 +53,14 @@ void ASM_AND_u64(RM *rm, u32 disp, bool flip);
     f.f.of = 0
 
 #define ASM_SUB_FLAGS(t, a, b, res)         \
+    f.f.cf = a < b;                         \
+    f.f.pf = ASM_getParity(res);            \
+    f.f.af = ((a ^ b ^ res) & 0x10) != 0;   \
+    f.f.zf = (res == 0);                    \
+    f.f.sf = (res & ((u##t)INT##t##_MAX + 1)) != 0; \
+    f.f.of = ((a ^ b) & (a ^ res) & ((u##t)INT##t##_MAX + 1)) != 0
+
+#define ASM_SBB_FLAGS(t, a, b, res)         \
     f.f.cf = a < b + f.f.cf;                \
     f.f.pf = ASM_getParity(res);            \
     f.f.af = ((a ^ b ^ res) & 0x10) != 0;   \
