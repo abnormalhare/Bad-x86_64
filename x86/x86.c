@@ -98,21 +98,21 @@ void ASM_05(u32 imm) {
         }
         u16 a = 0; u16 b = 0; u16 res = 0;
         a = regs[0].x; b = imm;
-        regs[0].x = (a += b);
+        regs[0].x = res = (a + b);
 
         ASM_ADD_FLAGS(16, a, b, res);
         printf("ADD ax, 0x%.4X", imm);
     } else if (rex.w) { ASM_incIP(6, NULL);
         u64 a = 0; u64 b = 0; u64 res = 0;
         a = regs[0].r; b = imm;
-        regs[0].r = (a += b);
+        regs[0].r = res = (a + b);
 
         ASM_ADD_FLAGS(64, a, b, res);
         printf("ADD rax, 0x%.8X", imm);
     } else { ASM_incIP(5, NULL);
         u32 a = 0; u32 b = 0; u32 res = 0;
         a = regs[0].e; b = imm;
-        regs[0].e = (a += b);
+        regs[0].e = res = (a + b);
 
         ASM_ADD_FLAGS(32, a, b, res);
         printf("ADD eax, 0x%.8X", imm);
@@ -222,21 +222,21 @@ void ASM_0D(u32 imm) {
         }
         u16 a = 0; u16 b = 0; u16 res = 0;
         a = regs[0].x; b = imm;
-        regs[0].x = (a |= b);
+        regs[0].x = res = (a | b);
 
         ASM_BIT_FLAGS(16, a, b, res);
         printf("OR ax, 0x%.4X", imm);
     } else if (rex.w) { ASM_incIP(6, NULL);
         u64 a = 0; u64 b = 0; u64 res = 0;
         a = regs[0].r; b = imm;
-        regs[0].r = (a |= b);
+        regs[0].r = res = (a | b);
 
         ASM_BIT_FLAGS(64, a, b, res);
         printf("OR rax, 0x%.8X", imm);
     } else { ASM_incIP(5, NULL);
         u32 a = 0; u32 b = 0; u32 res = 0;
         a = regs[0].e; b = imm;
-        regs[0].e = (a |= b);
+        regs[0].e = res = (a | b);
 
         ASM_BIT_FLAGS(32, a, b, res);
         printf("OR eax, 0x%.8X", imm);
@@ -357,21 +357,21 @@ void ASM_15(u32 imm) {
         }
         u16 a = 0; u16 b = 0; u16 res = 0;
         a = regs[0].x; b = imm;
-        regs[0].x = (a += b + f.f.cf);
+        regs[0].x = res = (a + b + f.f.cf);
 
         ASM_ADC_FLAGS(16, a, b, res);
         printf("ADC ax, 0x%.4X", imm);
     } else if (rex.w) { ASM_incIP(6, NULL);
         u64 a = 0; u64 b = 0; u64 res = 0;
         a = regs[0].r; b = imm;
-        regs[0].r = (a += b + f.f.cf);
+        regs[0].r = res = (a + b + f.f.cf);
 
         ASM_ADC_FLAGS(64, a, b, res);
         printf("ADC rax, 0x%.8X", imm);
     } else { ASM_incIP(5, NULL);
         u32 a = 0; u32 b = 0; u32 res = 0;
         a = regs[0].e; b = imm;
-        regs[0].e = (a += b + f.f.cf);
+        regs[0].e = res = (a + b + f.f.cf);
 
         ASM_ADC_FLAGS(32, a, b, res);
         printf("ADC eax, 0x%.8X", imm);
@@ -605,21 +605,21 @@ void ASM_25(u32 imm) {
         }
         u16 a = 0; u16 b = 0; u16 res = 0;
         a = regs[0].x; b = imm;
-        regs[0].x = (a &= b);
+        regs[0].x = res = (a & b);
 
         ASM_BIT_FLAGS(16, a, b, res);
         printf("AND ax, 0x%.4X", imm);
     } else if (rex.w) { ASM_incIP(6, NULL);
         u64 a = 0; u64 b = 0; u64 res = 0;
         a = regs[0].r; b = imm;
-        regs[0].r = (a &= b);
+        regs[0].r = res = (a & b);
 
         ASM_BIT_FLAGS(64, a, b, res);
         printf("AND rax, 0x%.8X", imm);
     } else { ASM_incIP(5, NULL);
         u32 a = 0; u32 b = 0; u32 res = 0;
         a = regs[0].e; b = imm;
-        regs[0].e = (a &= b);
+        regs[0].e = res = (a & b);
 
         ASM_BIT_FLAGS(32, a, b, res);
         printf("AND eax, 0x%.8X", imm);
@@ -863,21 +863,21 @@ void ASM_35(u32 imm) {
         }
         u16 a = 0; u16 b = 0; u16 res = 0;
         a = regs[0].x; b = imm;
-        regs[0].x = (a ^= b);
+        regs[0].x = res = (a ^ b);
 
         ASM_BIT_FLAGS(16, a, b, res);
         printf("XOR ax, 0x%.4X", imm);
     } else if (rex.w) { ASM_incIP(6, NULL);
         u64 a = 0; u64 b = 0; u64 res = 0;
         a = regs[0].r; b = imm;
-        regs[0].r = (a ^= b);
+        regs[0].r = res = (a ^ b);
 
         ASM_BIT_FLAGS(64, a, b, res);
         printf("XOR rax, 0x%.8X", imm);
     } else { ASM_incIP(5, NULL);
         u32 a = 0; u32 b = 0; u32 res = 0;
         a = regs[0].e; b = imm;
-        regs[0].e = (a ^= b);
+        regs[0].e = res = (a ^ b);
 
         ASM_BIT_FLAGS(32, a, b, res);
         printf("XOR eax, 0x%.8X", imm);
@@ -893,6 +893,128 @@ void ASM_36(void) {
 }
 
 // 0x37 invalid
+
+// CMP r/m(8), r(8)
+void ASM_38(u8 rm_code, u8 sib, s32 disp) {
+    RM *rm; u32 fdisp = ASM_setupOp(rm, rm_code, sib, disp, R_Bit8);
+
+    ASM_CMP_u8(rm, fdisp, false);
+
+    if (rm->isPtr) {
+        ASM_rmPrint("CMP", rm, disp, v_Reg, false);
+    } else {
+        printf("CMP %s, %s", ASM_getRegName(rm->areg, rm->atype), ASM_getRegName(rm->oreg, rm->otype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
+// CMP r/m(16-64), r(16-64)
+void ASM_31(u8 rm_code, u8 sib, s32 disp) {
+    RM *rm; u32 fdisp = ASM_setupOp(rm, rm_code, sib, disp, R_Bit32);
+
+    switch (rm->otype) {
+        default: break;
+        case R_Bit16: ASM_CMP_u16(rm, fdisp, false); break;
+        case R_Bit32: ASM_CMP_u32(rm, fdisp, false); break;
+        case R_Bit64: ASM_CMP_u64(rm, fdisp, false); break;
+    }
+
+    if (rm->isPtr) {
+        ASM_rmPrint("CMP", rm, disp, v_Reg, false);
+    } else {
+        printf("CMP %s, %s", ASM_getRegName(rm->areg, rm->atype), ASM_getRegName(rm->oreg, rm->otype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
+// CMP r(8), r/m(8)
+void ASM_32(u8 rm_code, u8 sib, s32 disp) {
+    RM *rm; u32 fdisp = ASM_setupOp(rm, rm_code, sib, disp, R_Bit8);
+
+    ASM_CMP_u8(rm, fdisp, true);
+
+    if (rm->isPtr) {
+        ASM_rmPrint("CMP", rm, disp, v_Reg, true);
+    } else {
+        printf("CMP %s, %s", ASM_getRegName(rm->oreg, rm->otype), ASM_getRegName(rm->areg, rm->atype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
+// CMP r(16-64), r/m(16-64)
+void ASM_33(u8 rm_code, u8 sib, s32 disp) {
+    RM *rm; u32 fdisp = ASM_setupOp(rm, rm_code, sib, disp, R_Bit32);
+
+    switch (rm->otype) {
+        default: break;
+        case R_Bit16: ASM_CMP_u16(rm, fdisp, true); break;
+        case R_Bit32: ASM_CMP_u32(rm, fdisp, true); break;
+        case R_Bit64: ASM_CMP_u64(rm, fdisp, true); break;
+    }
+
+    if (rm->isPtr) {
+        ASM_rmPrint("CMP", rm, disp, v_Reg, true);
+    } else {
+        printf("CMP %s, %s", ASM_getRegName(rm->oreg, rm->otype), ASM_getRegName(rm->areg, rm->atype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
+// CMP al, imm(8)
+void ASM_34(u8 imm) {
+    ASM_incIP(2, NULL);
+    
+    u8 a = 0; u8 b = 0; u8 res = 0;
+    a = regs[0].l; b = imm;
+    regs[0].l = (a - b);
+
+    ASM_BIT_FLAGS(8, a, b, res);
+    printf("CMP al, 0x%.2X", imm);
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
+// CMP r/e/ax, imm(16-32)
+void ASM_35(u32 imm) {
+    if (oper) { ASM_incIP(4, NULL);
+        if (imm > UINT16_MAX) {
+            printf("ERROR: Improper immediate size");
+            exit(EXIT_FAILURE);
+        }
+        u16 a = 0; u16 b = 0; u16 res = 0;
+        a = regs[0].x; b = imm;
+        res = (a - b);
+
+        ASM_BIT_FLAGS(16, a, b, res);
+        printf("CMP ax, 0x%.4X", imm);
+    } else if (rex.w) { ASM_incIP(6, NULL);
+        u64 a = 0; u64 b = 0; u64 res = 0;
+        a = regs[0].r; b = imm;
+        res = (a - b);
+
+        ASM_BIT_FLAGS(64, a, b, res);
+        printf("CMP rax, 0x%.8X", imm);
+    } else { ASM_incIP(5, NULL);
+        u32 a = 0; u32 b = 0; u32 res = 0;
+        a = regs[0].e; b = imm;
+        res = (a - b);
+
+        ASM_BIT_FLAGS(32, a, b, res);
+        printf("CMP eax, 0x%.8X", imm);
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
 
 // CMP r/m(8), r(8)
 void ASM_38(u8 rm_code, u8 sib, s32 disp) {
