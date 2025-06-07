@@ -728,8 +728,8 @@ void ASM_MOV_u32(RM *rm, u32 disp, bool flip) {
         else       { b = *s; a = &regs[rm->oreg].e; }
         *a = b;
     } else {
-        if (!flip) { a = &regs[rm->areg].e; b = regs[rm->oreg].e; }
-        else       { b = regs[rm->areg].e; a = &regs[rm->oreg].e; }
+        if (!flip) { a = &regs[rm->areg].e; b = regs[rm->oreg].e; regs[rm->areg].eh = 0; }
+        else       { b = regs[rm->areg].e; a = &regs[rm->oreg].e; regs[rm->oreg].eh = 0; }
         *a = b;
     }
 }
