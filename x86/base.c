@@ -16,6 +16,7 @@ bool sing = false; // float   override prefix
 bool fs   = false; // fs      override prefix
 bool gs   = false; // gs      override prefix
 bool lock = false; // lock prefix
+bool null = false; // null prefix
 REXPrefix rex;
 
 u8 *stack;
@@ -34,6 +35,8 @@ void ASM_init() {
         xregs[i].xi.low = 0;
         xregs[i].xi.high = 0;
     }
+
+    srand(time(0));
     // for (int i = 0; i < 16; i++) {
     //     yregs[i].xi[0].low = 0;
     //     yregs[i].xi[0].high = 0;
@@ -137,12 +140,12 @@ RM ASM_getRM(u8 rm, u8 sib, RegType type) {
 }
 
 ASM_codeFunc ASM_getFunc(u64 ip) {
-    STACK64(temp, ip);
+    STACK(u64, temp, ip);
     ASM_codeFunc func = NULL;
     
     func = (ASM_codeFunc)*temp;
     if ((u64)func < 0x100000) {
-        STACK64(temp2, *temp);
+        STACK(u64, temp2, *temp);
         func = (ASM_codeFunc)*temp2;
     }
 
@@ -191,6 +194,13 @@ u32 ASM_getDisp(RM *rm, s32 disp) {
     }
 }
 
+u32 ASM_setupOp(RM *rm, u8 rm_code, u8 sib, s32 disp, RegType type) {
+    RM nrm = ASM_getRM(rm_code, sib, type);
+    *rm = nrm;
+    ASM_incIP(2, rm);
+    return ASM_getDisp(rm, disp);
+}
+
 void ASM_incIP(u32 num, RM *rm) {
     if (rm == NULL) {
         regs[16].e += num;
@@ -212,7 +222,7 @@ bool ASM_getParity(u8 num) {
     num ^= num >> 4;
     num ^= num >> 2;
     num ^= num >> 1;
-    return ~(num & 1) == 1;
+    return !(num & 1);
 }
 
 void ASM_setFlags(Reg *prev, Reg *res, RegType type, bool borrow) {
@@ -377,21 +387,23 @@ void ASM_rexPrint(void) {
     );
     
     int sp = regs[4].e;
-    if (sp < 0x80000000)
-        printf(" %.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X\n",
-                stack[sp], stack[sp + 1], stack[sp + 2], stack[sp + 3], stack[sp + 4], stack[sp + 5], stack[sp + 6], stack[sp + 7]);
-    else printf("\n");
+    if (sp <= 0x80000000 - 0x10) {
+        STACK(u64, n1, sp);
+        STACK(u64, n2, sp + 0x8);
+        printf(" %.16llX %.16llX\n", *n1, *n2);
+    } else printf("\n");
     
     printf("  | F:%d%d%d%d%d%d%d%d|8:%.16llX 9:%.16llX 10:%.16llX 11:%.16llX 12:%.16llX 13:%.16llX 14:%.16llX 15:%.16llX|BP:%.8X :",
         f.f.of, f.f.df, f.f.iF, f.f.sf, f.f.zf, f.f.af, f.f.pf, f.f.cf,
         regs[8].r, regs[9].r, regs[10].r, regs[11].r, regs[12].r, regs[13].r, regs[14].r, regs[15].r, regs[5].e
     );
 
-    sp = regs[4].e + 8;
-    if (sp < 0x80000000)
-        printf(" %.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X\n",
-                stack[sp], stack[sp + 1], stack[sp + 2], stack[sp + 3], stack[sp + 4], stack[sp + 5], stack[sp + 6], stack[sp + 7]);
-    else printf("\n");
+    sp = regs[4].e + 0x10;
+    if (sp <= 0x80000000 - 0x10) {
+        STACK(u64, n1, sp);
+        STACK(u64, n2, sp + 0x8);
+        printf(" %.16llX %.16llX\n", *n1, *n2);
+    } else printf("\n");
 }
 
 bool ASM_sign = false;
@@ -413,7 +425,6 @@ void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip) {
         sDisp = -sDisp;
         ASM_sign = true;
     }
-
 
     if (lock) {
         sprintf_s(buf, 256, "LOCK ");
@@ -491,10 +502,10 @@ void ASM_regPrint(void) {
             sprintf(buf, "%s\n", buf);
         }
     }
-    sprintf(buf, "%srip: %.16llX  eflags: %d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n", buf, regs[16].r, 
+    sprintf(buf, "%srip: %.16llX  efl: %d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n", buf, regs[16].r, 
         f.f.md, f.f.nt, f.f.io / 2, f.f.io % 2, f.f.of, f.f.df, f.f.iF, f.f.tf, f.f.sf, f.f.zf, f.f._reserved2, f.f.af, f.f._reserved1, f.f.pf, f.f.on, f.f.cf
     );
-    sprintf(buf, "%s                               mn[]oditsz_a_p1c\n\n", buf);
+    sprintf(buf, "%s                            mn[]oditsz_a_p1c\n\n", buf);
 
     for (int i = 0; i < 16; i++) {
         if (i < 10)
@@ -520,13 +531,13 @@ void ASM_end(void) {
     rex.x = 0;
     rex.b = 0;
 
-    oper = 0;
-    addr = 0;
-    doub = 0;
-    sing = 0;
-    fs = 0;
-    gs = 0;
-    lock = 0;
+    oper = false;
+    addr = false;
+    doub = false;
+    sing = false;
+    fs = false;
+    gs = false;
+    lock = false;
 }
 
 void ASM_exit(void) {

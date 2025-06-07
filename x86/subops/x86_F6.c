@@ -2,7 +2,7 @@
 
 
 
-// TEST r/m(16-64), r(16-64)
+// TEST r/m(16-64), imm(8)
 void ASM_F6TEST(RM *rm, s32 disp, u8 val) {
     Reg prev = { 0 };
     Reg res = { 0 };
@@ -27,9 +27,10 @@ void ASM_F6TEST(RM *rm, s32 disp, u8 val) {
 
     res.l = prev.l & val;
 
-    u8 fa = f.f.af;
-    ASM_setFlags(&prev, &res, rm->otype, false);
-    f.f.af = fa;
+    f.f.zf = (res.l == 0);
+    f.f.sf = ((res.l & 0x80) == 0x80);
+    f.f.of = 0;
+    f.f.cf = 0;
 
     ASM_rexPrint();
     ASM_end();

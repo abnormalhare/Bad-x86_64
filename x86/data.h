@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #ifdef _WIN64
 #include <windows.h>
@@ -130,11 +131,11 @@ typedef union flag {
 } Flags;
 
 typedef struct _rex_prefix {
-    uint8_t b : 1;
-    uint8_t x : 1;
-    uint8_t r : 1;
-    uint8_t w : 1;
-    uint8_t enable : 4;
+    u8 b : 1;
+    u8 x : 1;
+    u8 r : 1;
+    u8 w : 1;
+    u8 enable : 4;
 } REXPrefix;
 
 typedef enum _reg_type {
@@ -218,6 +219,7 @@ extern bool sing; // float   override prefix
 extern bool fs; // fs      override prefix
 extern bool gs; // gs      override prefix
 extern bool lock; // lock prefix
+extern bool null; // lock prefix
 extern REXPrefix rex;
 
 extern u8 *stack;
@@ -231,27 +233,7 @@ extern u8 *stack;
 #define ALIGN_STACK_256 31
 #define ALIGN_STACK_512 63
 
-#define STACKSTRP(n, v) n = (char*)&stack[v]
-#define STACK8P(n, v) n = (u8*)&stack[v]
-#define STACK16P(n, v) n = (u16*)&stack[v]
-#define STACK32P(n, v) n = (u32*)&stack[v]
-#define STACK32FP(n, v) n = (f32*)&stack[v]
-#define STACK64P(n, v) n = (u64*)&stack[v]
-#define STACK64FP(n, v) n = (f64*)&stack[v]
-#define STACK128P(n, v) n = (__m128i*)&stack[v]
-#define STACK256P(n, v) n = (__m256i*)&stack[v]
-#define STACK512P(n, v) n = (__m512i*)&stack[v]
-
-#define STACKSTR(n, v) char*n; STACKSTRP(n, v)
-#define STACK8(n, v) u8*n; STACK8P(n, v)
-#define STACK16(n, v) u16*n; STACK16P(n, v)
-#define STACK32(n, v) u32*n; STACK32P(n, v)
-#define STACK32F(n, v) f32*n; STACK32FP(n, v)
-#define STACK64(n, v) u64*n; STACK64P(n, v)
-#define STACK64F(n, v) f64*n; STACK64FP(n, v)
-#define STACK128(n, v) __m128i*n; STACK128P(n, v)
-#define STACK256(n, v) __m256i*n; STACK256P(n, v)
-#define STACK512(n, v) __m512i*n; STACK512P(n, v)
+#define STACK(t, n, v) t* n = (t*)&stack[v]
 
 #define IS_INT(type) (((type) == R_Bit8) || ((type) == R_Bit8H) || ((type) == R_Bit16) || ((type) == R_Bit32) || ((type) == R_Bit64))
 #define IS_FLOAT(type) (((type) == R_Float32) || ((type) == R_Float64) || ((type) == R_Float128) || ((type) == R_Float256) || ((type) == R_Float512))
@@ -279,6 +261,8 @@ ASM_codeFunc ASM_getFunc(u64 ip);
 ASM_codeFunc ASM_getCurrFunc(void);
 u64 ASM_getReg(u8 index, RegType type);
 u32 ASM_getDisp(RM *rm, s32 disp);
+u32 ASM_setupOp(RM *rm, u8 rm_code, u8 sib, s32 disp, RegType type);
+bool ASM_getParity(u8 num);
 void ASM_incIP(u32 num, RM *rm);
 void ASM_setFlags(Reg *prev, Reg *res, RegType type, bool borrow);
 char *ASM_getRegName(u8 index, RegType type);

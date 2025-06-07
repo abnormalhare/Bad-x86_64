@@ -2,6 +2,7 @@
 #define BD6C694D_1681_47C6_8F9C_5C15CFF88DFD
 
 #include "data.h"
+#include "alu.h"
 
 void ASM_01(u8 rm_code, u8 sib, s32 disp);
 void ASM_03(u8 rm_code, u8 sib, s32 disp);
@@ -46,6 +47,7 @@ bool _ASM_77(s8 val);
 bool _ASM_78(s8 val);
 bool _ASM_79(s8 val);
 bool _ASM_7C(s8 val);
+bool _ASM_7E(s8 val);
 #define ASM_72(val, t) if (_ASM_72(val)) goto JMP_##t
 #define ASM_73(val, t) if (_ASM_73(val)) goto JMP_##t
 #define ASM_74(val, t) if (_ASM_74(val)) goto JMP_##t
@@ -55,6 +57,7 @@ bool _ASM_7C(s8 val);
 #define ASM_78(val, t) if (_ASM_78(val)) goto JMP_##t
 #define ASM_79(val, t) if (_ASM_79(val)) goto JMP_##t
 #define ASM_7C(val, t) if (_ASM_7C(val)) goto JMP_##t
+#define ASM_7E(val, t) if (_ASM_7E(val)) goto JMP_##t
 void ASM_80(u8 rm_code, u8 sib, s32 disp, u8 val);
 void ASM_81(u8 rm_code, u8 sib, s32 disp, u32 val);
 void ASM_83(u8 rm_code, u8 sib, s32 disp, u8 val);
