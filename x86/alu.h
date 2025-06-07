@@ -38,6 +38,11 @@ void ASM_XOR_u16(RM *rm, u32 disp, bool flip);
 void ASM_XOR_u32(RM *rm, u32 disp, bool flip);
 void ASM_XOR_u64(RM *rm, u32 disp, bool flip);
 
+void ASM_CMP_u8 (RM *rm, u32 disp, bool flip);
+void ASM_CMP_u16(RM *rm, u32 disp, bool flip);
+void ASM_CMP_u32(RM *rm, u32 disp, bool flip);
+void ASM_CMP_u64(RM *rm, u32 disp, bool flip);
+
 void ASM_TEST_u8 (RM *rm, u32 disp, bool flip);
 void ASM_TEST_u16(RM *rm, u32 disp, bool flip);
 void ASM_TEST_u32(RM *rm, u32 disp, bool flip);

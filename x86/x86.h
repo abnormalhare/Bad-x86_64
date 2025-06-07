@@ -4,11 +4,18 @@
 #include "data.h"
 #include "alu.h"
 
+void ASM_00(u8 rm_code, u8 sib, s32 disp);
 void ASM_01(u8 rm_code, u8 sib, s32 disp);
+void ASM_02(u8 rm_code, u8 sib, s32 disp);
 void ASM_03(u8 rm_code, u8 sib, s32 disp);
+void ASM_04(u8 imm);
+void ASM_05(u32 imm);
+void ASM_08(u8 rm_code, u8 sib, s32 disp);
+void ASM_09(u8 rm_code, u8 sib, s32 disp);
+void ASM_0A(u8 rm_code, u8 sib, s32 disp);
 void ASM_0B(u8 rm_code, u8 sib, s32 disp);
-void ASM_0C(u8 val);
-
+void ASM_0C(u8 imm);
+void ASM_0D(u32 imm);
 void ASM_0F(u8 index, Data* data);
 bool _ASM_0F_82(Data *data);
 bool _ASM_0F_83(Data *data);
@@ -21,15 +28,46 @@ bool _ASM_0F_8E(Data *data);
 #define ASM_0F_J(ix, data, t) if (_ASM_0F_## ix (data)) goto JMP_##t; ASM_end()
 #define ASM_0F_R(ix, data) if (_ASM_0F_## ix (data)) return; ASM_end()
 
+void ASM_10(u8 rm_code, u8 sib, s32 disp);
+void ASM_11(u8 rm_code, u8 sib, s32 disp);
+void ASM_12(u8 rm_code, u8 sib, s32 disp);
+void ASM_13(u8 rm_code, u8 sib, s32 disp);
+void ASM_14(u8 imm);
+void ASM_15(u32 imm);
+void ASM_18(u8 rm_code, u8 sib, s32 disp);
+void ASM_19(u8 rm_code, u8 sib, s32 disp);
+void ASM_1A(u8 rm_code, u8 sib, s32 disp);
+void ASM_1B(u8 rm_code, u8 sib, s32 disp);
+void ASM_1C(u8 imm);
+void ASM_1D(u32 imm);
+void ASM_20(u8 rm_code, u8 sib, s32 disp);
+void ASM_21(u8 rm_code, u8 sib, s32 disp);
+void ASM_22(u8 rm_code, u8 sib, s32 disp);
 void ASM_23(u8 rm_code, u8 sib, s32 disp);
+void ASM_24(u8 imm);
+void ASM_25(u32 imm);
+void ASM_26(void);
+void ASM_28(u8 rm_code, u8 sib, s32 disp);
+void ASM_29(u8 rm_code, u8 sib, s32 disp);
+void ASM_2A(u8 rm_code, u8 sib, s32 disp);
 void ASM_2B(u8 rm_code, u8 sib, s32 disp);
+void ASM_2C(u8 imm);
+void ASM_2D(u32 imm);
+void ASM_2E(void);
+void ASM_30(u8 rm_code, u8 sib, s32 disp);
 void ASM_31(u8 rm_code, u8 sib, s32 disp);
 void ASM_32(u8 rm_code, u8 sib, s32 disp);
 void ASM_33(u8 rm_code, u8 sib, s32 disp);
+void ASM_34(u8 imm);
+void ASM_35(u32 imm);
+void ASM_36(void);
 void ASM_38(u8 rm_code, u8 sib, s32 disp);
 void ASM_39(u8 rm_code, u8 sib, s32 disp);
+void ASM_3A(u8 rm_code, u8 sib, s32 disp);
 void ASM_3B(u8 rm_code, u8 sib, s32 disp);
-void ASM_3D(s32 val);
+void ASM_3C(u8 imm);
+void ASM_3D(u32 imm);
+void ASM_3E(void);
 void ASM_4X(u8 in_rex);
 void ASM_5L(u8 in);
 void ASM_5H(u8 in);
