@@ -26,7 +26,7 @@ void ASM_init() {
 
     for (int i = 0; i < 16; i++) {
         if (i == 4 || i == 5) {
-            regs[i].r = INT32_MIN;
+            regs[i].r = UINT32_MAX - (UINT32_MAX / 2);
         } else {
             regs[i].r = 0;
         }
@@ -194,10 +194,10 @@ u32 ASM_getDisp(RM *rm, s32 disp) {
     }
 }
 
-u32 ASM_setupOp(RM *rm, u8 rm_code, u8 sib, s32 disp, RegType type) {
+u32 ASM_setupOp(RM *rm, u8 rm_code, u8 sib, s32 disp, u32 ip, RegType type) {
     RM nrm = ASM_getRM(rm_code, sib, type);
     *rm = nrm;
-    ASM_incIP(2, rm);
+    ASM_incIP(ip, rm);
     return ASM_getDisp(rm, disp);
 }
 

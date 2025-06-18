@@ -5,9 +5,9 @@ void ASM_0F_BABT(RM *rm, s32 disp, u8 val) {
         u32 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->otype) {
-            case R_Bit16: { STACK16(temp, fdisp); f.f.cf = ((*temp & (1 << val)) == (1 << val)); break; }
-            case R_Bit32: { STACK32(temp, fdisp); f.f.cf = ((*temp & (1 << val)) == (1 << val)); break; }
-            case R_Bit64: { STACK64(temp, fdisp); f.f.cf = ((*temp & (1 << val)) == (1 << val)); break; }
+            case R_Bit16: { STACK(u16, s, fdisp); f.f.cf = ((*s & (1 << val)) == (1 << val)); break; }
+            case R_Bit32: { STACK(u32, s, fdisp); f.f.cf = ((*s & (1 << val)) == (1 << val)); break; }
+            case R_Bit64: { STACK(u64, s, fdisp); f.f.cf = ((*s & (1 << val)) == (1 << val)); break; }
             default: break;
         }
 

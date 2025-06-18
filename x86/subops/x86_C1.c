@@ -8,9 +8,9 @@ void ASM_C1SHL(RM *rm, s32 disp, u8 val) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
         switch (rm->otype) {
-            case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; *temp <<= val; break; }
-            case R_Bit32: { STACK32(temp, fdisp); prev.e = *temp; *temp <<= val; break; }
-            case R_Bit64: { STACK64(temp, fdisp); prev.r = *temp; *temp <<= val; break; }
+            case R_Bit16: { STACK(u16, s, fdisp); prev.x = *s; *s <<= val; break; }
+            case R_Bit32: { STACK(u32, s, fdisp); prev.e = *s; *s <<= val; break; }
+            case R_Bit64: { STACK(u64, s, fdisp); prev.r = *s; *s <<= val; break; }
             default: break;
         }
 
@@ -55,9 +55,9 @@ void ASM_C1SHR(RM *rm, s32 disp, u8 val) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
         switch (rm->otype) {
-            case R_Bit16: { STACK16(temp, fdisp); prev.x = *temp; *temp >>= val; break; }
-            case R_Bit32: { STACK32(temp, fdisp); prev.e = *temp; *temp >>= val; break; }
-            case R_Bit64: { STACK64(temp, fdisp); prev.r = *temp; *temp >>= val; break; }
+            case R_Bit16: { STACK(u16, s, fdisp); prev.x = *s; *s >>= val; break; }
+            case R_Bit32: { STACK(u32, s, fdisp); prev.e = *s; *s >>= val; break; }
+            case R_Bit64: { STACK(u64, s, fdisp); prev.r = *s; *s >>= val; break; }
             default: break;
         }
 

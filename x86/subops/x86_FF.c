@@ -10,9 +10,9 @@ void ASM_FFINC(RM *rm, s32 disp) {
         u32 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->otype) {
-            case R_Bit16: { STACK16(temp, fdisp); prev.x = (*temp)++; break; }
-            case R_Bit32: { STACK32(temp, fdisp); prev.e = (*temp)++; break; }
-            case R_Bit64: { STACK64(temp, fdisp); prev.r = (*temp)++; break; }
+            case R_Bit16: { STACK(u16, s, fdisp); prev.x = (*s)++; break; }
+            case R_Bit32: { STACK(u32, s, fdisp); prev.e = (*s)++; break; }
+            case R_Bit64: { STACK(u64, s, fdisp); prev.r = (*s)++; break; }
             default: break;
         }
 
@@ -46,9 +46,9 @@ void ASM_FFDEC(RM *rm, s32 disp) {
         u32 fdisp = ASM_getDisp(rm, disp);
         
         switch (rm->otype) {
-            case R_Bit16: { STACK16(temp, fdisp); prev.x = (*temp)--; break; }
-            case R_Bit32: { STACK32(temp, fdisp); prev.e = (*temp)--; break; }
-            case R_Bit64: { STACK64(temp, fdisp); prev.r = (*temp)--; break; }
+            case R_Bit16: { STACK(u16, s, fdisp); prev.x = (*s)--; break; }
+            case R_Bit32: { STACK(u32, s, fdisp); prev.e = (*s)--; break; }
+            case R_Bit64: { STACK(u64, s, fdisp); prev.r = (*s)--; break; }
             default: break;
         }
 
@@ -74,12 +74,11 @@ void ASM_FFDEC(RM *rm, s32 disp) {
 
 void ASM_FFCALL(RM *rm, s32 disp) {
     ASM_codeFunc func;
-    u8 s;
-
+    
     ASM_incIP(2, rm);
     regs[4].r -= 8;
-    STACK64(temp, regs[4].e);
-    *temp = regs[16].e;
+    STACK(u64, s, regs[4].e);
+    *s = regs[16].e;
     
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
@@ -90,8 +89,6 @@ void ASM_FFCALL(RM *rm, s32 disp) {
             case R_Bit64: { regs[16].r = fdisp; break; }
             default: break;
         }
-
-        if (rm->atype == R_Seg) rm->areg = s;
 
         ASM_rmPrint("CALL cs:", rm, disp, v_None, false);
         ASM_rexPrint();

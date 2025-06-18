@@ -9,20 +9,19 @@ void ASM_D1SHR(RM *rm, s32 disp) {
 
         switch (rm->otype) {
             case R_Bit16: {
-                STACK16(temp, fdisp);
-                prev.x = *temp; *temp >>= 1;
+                STACK(u16, s, fdisp);
+                prev.x = *s; *s >>= 1;
                 break;
             } case R_Bit32: {
-                STACK32(temp, fdisp);
-                prev.x = *temp; *temp >>= 1;
+                STACK(u32, s, fdisp);
+                prev.x = *s; *s >>= 1;
                 break;
             } case R_Bit64: {
-                STACK64(temp, fdisp);
-                prev.x = *temp; *temp >>= 1;
+                STACK(u64, s, fdisp);
+                prev.x = *s; *s >>= 1;
                 break;
             } default: break;
         }
-        STACK8(temp, fdisp); prev.l = *temp; *temp >>= 1;
 
         rm->val = 1;
         rm->valtype = R_Bit8;

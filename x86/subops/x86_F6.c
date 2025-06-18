@@ -10,8 +10,8 @@ void ASM_F6TEST(RM *rm, s32 disp, u8 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
-        STACK8(temp, fdisp);
-        prev.l = *temp;
+        STACK(u8, s, fdisp);
+        prev.l = *s;
 
         rm->val = val;
         rm->valtype = R_Bit8;

@@ -118,7 +118,7 @@ void ASM_C6(u8 rm_code, u8 sib, s32 disp, u8 val);
 void ASM_C7(u8 rm_code, u8 sib, s32 disp, u32 val);
 void ASM_D1(u8 rm_code, u8 sib, s32 disp);
 void ASM_E8(u32 val);
-bool ASM_E9(u32 val, bool call);
+void ASM_E9(u32 val, bool call);
 #define ASM_E9_J(val, t) ASM_E9(val, false); goto JMP_##t
 void _ASM_EB(u8 val);
 #define ASM_EB(val, t) _ASM_EB(val); goto JMP_##t

@@ -191,7 +191,7 @@ typedef struct _data {
     u8 sib;
     u32 val;
     s32 disp;
-    RM *rm;
+    RM rm;
     RegType regType;
     RegType valType;
     bool call;
@@ -261,7 +261,7 @@ ASM_codeFunc ASM_getFunc(u64 ip);
 ASM_codeFunc ASM_getCurrFunc(void);
 u64 ASM_getReg(u8 index, RegType type);
 u32 ASM_getDisp(RM *rm, s32 disp);
-u32 ASM_setupOp(RM *rm, u8 rm_code, u8 sib, s32 disp, RegType type);
+u32 ASM_setupOp(RM *rm, u8 rm_code, u8 sib, s32 disp, u32 ip, RegType type);
 bool ASM_getParity(u8 num);
 void ASM_incIP(u32 num, RM *rm);
 void ASM_setFlags(Reg *prev, Reg *res, RegType type, bool borrow);
