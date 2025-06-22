@@ -9,14 +9,14 @@ void ASM_80OR(RM *rm, s32 disp, u8 val) {
     
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
-        
-        STACK(u8, s, fdisp);
-        prev.l = *s;
-        *s |= sval;
 
         rm->val = sval;
         rm->valtype = R_Bit8;
         ASM_rmPrint("OR", rm, disp, v_Val, false);
+        
+        STACK(u8, s, fdisp);
+        prev.l = *s;
+        *s |= sval;
     } else {
         switch (rm->atype) {
             case R_Bit8:  prev.l = regs[rm->areg].l; regs[rm->areg].l |= sval; break;
@@ -48,14 +48,14 @@ void ASM_80AND(RM *rm, s32 disp, u8 val) {
     
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
-        
-        STACK(u8, s, fdisp);
-        prev.l = *s;
-        *s &= sval;
 
         rm->val = sval;
         rm->valtype = R_Bit8;
         ASM_rmPrint("AND", rm, disp, v_Val, false);
+        
+        STACK(u8, s, fdisp);
+        prev.l = *s;
+        *s &= sval;
     } else {
         switch (rm->atype) {
             case R_Bit8:  prev.l = regs[rm->areg].l; regs[rm->areg].l &= sval; break;
@@ -87,12 +87,12 @@ void ASM_80CMP(RM *rm, s32 disp, u8 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
-        STACK(u8, s, fdisp);
-        prev.l = *s;
-
         rm->val = val;
         rm->valtype = R_Bit8;
         ASM_rmPrint("CMP", rm, disp, v_Val, false);
+
+        STACK(u8, s, fdisp);
+        prev.l = *s;
     } else {
         switch (rm->otype) {
             case R_Bit8:  prev.l = regs[rm->areg].l; break;

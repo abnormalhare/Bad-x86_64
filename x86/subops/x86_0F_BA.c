@@ -3,6 +3,10 @@
 void ASM_0F_BABT(RM *rm, s32 disp, u8 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
+
+        rm->val = val;
+        rm->valtype = R_Bit8;
+        ASM_rmPrint("BT", rm, disp, v_Val, false);
         
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); f.f.cf = ((*s & (1 << val)) == (1 << val)); break; }
@@ -10,10 +14,6 @@ void ASM_0F_BABT(RM *rm, s32 disp, u8 val) {
             case R_Bit64: { STACK(u64, s, fdisp); f.f.cf = ((*s & (1 << val)) == (1 << val)); break; }
             default: break;
         }
-
-        rm->val = val;
-        rm->valtype = R_Bit8;
-        ASM_rmPrint("BT", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
             case R_Bit16: f.f.cf = ((regs[rm->areg].x & (1 << val)) == (1 << val)); break;

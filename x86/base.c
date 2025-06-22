@@ -37,12 +37,6 @@ void ASM_init() {
     }
 
     srand(time(0));
-    // for (int i = 0; i < 16; i++) {
-    //     yregs[i].xi[0].low = 0;
-    //     yregs[i].xi[0].high = 0;
-    //     yregs[i].xi[1].low = 0;
-    //     yregs[i].xi[1].high = 0;
-    // }
 }
 
 void ASM_getSIB(RM *rm, u8 sib) {

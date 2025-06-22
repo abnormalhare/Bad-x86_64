@@ -8,6 +8,8 @@ void ASM_FFINC(RM *rm, s32 disp) {
 
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
+
+        ASM_rmPrint("INC", rm, disp, v_None, false);
         
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); prev.x = (*s)++; break; }
@@ -15,8 +17,6 @@ void ASM_FFINC(RM *rm, s32 disp) {
             case R_Bit64: { STACK(u64, s, fdisp); prev.r = (*s)++; break; }
             default: break;
         }
-
-        ASM_rmPrint("INC", rm, disp, v_None, false);
     } else {
         switch (rm->otype) {
             case R_Bit16: { prev.x = regs[rm->areg].x++; break; }
@@ -44,6 +44,8 @@ void ASM_FFDEC(RM *rm, s32 disp) {
 
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
+
+        ASM_rmPrint("DEC", rm, disp, v_None, false);
         
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); prev.x = (*s)--; break; }
@@ -51,8 +53,6 @@ void ASM_FFDEC(RM *rm, s32 disp) {
             case R_Bit64: { STACK(u64, s, fdisp); prev.r = (*s)--; break; }
             default: break;
         }
-
-        ASM_rmPrint("DEC", rm, disp, v_None, false);
     } else {
         switch (rm->otype) {
             case R_Bit16: { prev.x = regs[rm->areg].x--; break; }
@@ -82,6 +82,8 @@ void ASM_FFCALL(RM *rm, s32 disp) {
     
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
+
+        ASM_rmPrint("CALL cs:", rm, disp, v_None, false);
         
         switch (rm->atype) {
             case R_Bit16: { regs[16].x = fdisp; break; }
@@ -89,8 +91,6 @@ void ASM_FFCALL(RM *rm, s32 disp) {
             case R_Bit64: { regs[16].r = fdisp; break; }
             default: break;
         }
-
-        ASM_rmPrint("CALL cs:", rm, disp, v_None, false);
         ASM_rexPrint();
     } else {
         switch (rm->atype) {
@@ -118,6 +118,9 @@ void ASM_FFJMP(RM *rm, s32 disp) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
         
+        if (rm->atype == R_Seg) rm->areg = s;
+        ASM_rmPrint("JMP cs:", rm, disp, v_None, false);
+        
         switch (rm->atype) {
             case R_Bit16: { regs[16].x = fdisp; break; }
             case R_Bit32: { regs[16].e = fdisp; break; }
@@ -125,8 +128,6 @@ void ASM_FFJMP(RM *rm, s32 disp) {
             default: break;
         }
 
-        if (rm->atype == R_Seg) rm->areg = s;
-        ASM_rmPrint("JMP cs:", rm, disp, v_None, false);
         ASM_rexPrint();
     } else {
         switch (rm->atype) {

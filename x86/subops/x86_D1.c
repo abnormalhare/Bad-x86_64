@@ -7,6 +7,10 @@ void ASM_D1SHR(RM *rm, s32 disp) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
+        rm->val = 1;
+        rm->valtype = R_Bit8;
+        ASM_rmPrint("SHR", rm, disp, v_Val, false);
+
         switch (rm->otype) {
             case R_Bit16: {
                 STACK(u16, s, fdisp);
@@ -22,10 +26,6 @@ void ASM_D1SHR(RM *rm, s32 disp) {
                 break;
             } default: break;
         }
-
-        rm->val = 1;
-        rm->valtype = R_Bit8;
-        ASM_rmPrint("SHR", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
             case R_Bit16:

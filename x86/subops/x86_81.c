@@ -6,6 +6,10 @@ void ASM_81ADD(RM *rm, s32 disp, u32 val) {
     
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
+
+        rm->val = val;
+        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
+        ASM_rmPrint("ADD", rm, disp, v_Val, false);
         
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); prev.x = *s; *s += val; break; }
@@ -13,10 +17,6 @@ void ASM_81ADD(RM *rm, s32 disp, u32 val) {
             case R_Bit64: { STACK(u64, s, fdisp); prev.r = *s; *s += val; break; }
             default: break;
         }
-
-        rm->val = val;
-        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
-        ASM_rmPrint("ADD", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
             case R_Bit16:
@@ -56,16 +56,16 @@ void ASM_81AND(RM *rm, s32 disp, u32 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
+        rm->val = val;
+        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
+        ASM_rmPrint("AND", rm, disp, v_Val, false);
+
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); prev.x = *s; *s &= val; break; }
             case R_Bit32: { STACK(u32, s, fdisp); prev.e = *s; *s &= val; break; }
             case R_Bit64: { STACK(u64, s, fdisp); prev.r = *s; *s &= val; break; }
             default: break;
         }
-
-        rm->val = val;
-        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
-        ASM_rmPrint("AND", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
             case R_Bit16:
@@ -111,16 +111,16 @@ void ASM_81SUB(RM *rm, s32 disp, u32 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
+        rm->val = val;
+        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
+        ASM_rmPrint("SUB", rm, disp, v_Val, false);
+
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); prev.x = *s; *s -= val; break; }
             case R_Bit32: { STACK(u32, s, fdisp); prev.e = *s; *s -= val; break; }
             case R_Bit64: { STACK(u64, s, fdisp); prev.r = *s; *s -= val; break; }
             default: break;
         }
-
-        rm->val = val;
-        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
-        ASM_rmPrint("SUB", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
             case R_Bit16:
@@ -160,16 +160,16 @@ void ASM_81CMP(RM *rm, s32 disp, u32 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
+        rm->val = val;
+        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
+        ASM_rmPrint("CMP", rm, disp, v_Val, false);
+
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); prev.x = *s; break; }
             case R_Bit32: { STACK(u32, s, fdisp); prev.e = *s; break; }
             case R_Bit64: { STACK(u64, s, fdisp); prev.r = *s; break; }
             default: break;
         }
-
-        rm->val = val;
-        rm->valtype = (rm->otype == R_Bit16) ? (R_Bit16) : (R_Bit32);
-        ASM_rmPrint("CMP", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
             case R_Bit16:

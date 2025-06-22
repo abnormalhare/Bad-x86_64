@@ -3,6 +3,8 @@
 void ASM_F7NOT(RM *rm, s32 disp, u8 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
+
+        ASM_rmPrint("NOT", rm, disp, v_None, false);
         
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); *s = ~*s; break; }
@@ -10,8 +12,6 @@ void ASM_F7NOT(RM *rm, s32 disp, u8 val) {
             case R_Bit64: { STACK(u64, s, fdisp); *s = ~*s; break; }
             default: break;
         }
-
-        ASM_rmPrint("NOT", rm, disp, v_None, false);
     } else {
         switch (rm->otype) {
             case R_Bit16: regs[rm->areg].x = ~regs[rm->areg].x; break;
@@ -29,6 +29,8 @@ void ASM_F7NOT(RM *rm, s32 disp, u8 val) {
 void ASM_F7NEG(RM *rm, s32 disp, u8 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
+
+        ASM_rmPrint("NEG", rm, disp, v_None, false);
         
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); *s = -*s; break; }
@@ -36,8 +38,6 @@ void ASM_F7NEG(RM *rm, s32 disp, u8 val) {
             case R_Bit64: { STACK(u64, s, fdisp); *s = -*s; break; }
             default: break;
         }
-
-        ASM_rmPrint("NEG", rm, disp, v_None, false);
     } else {
         switch (rm->otype) {
             case R_Bit16: regs[rm->areg].x = -regs[rm->areg].x; break;

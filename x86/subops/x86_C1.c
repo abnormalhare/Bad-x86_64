@@ -7,16 +7,16 @@ void ASM_C1SHL(RM *rm, s32 disp, u8 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
+        rm->val = val;
+        rm->valtype = R_Bit8;
+        ASM_rmPrint("SHL", rm, disp, v_Val, false);
+
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); prev.x = *s; *s <<= val; break; }
             case R_Bit32: { STACK(u32, s, fdisp); prev.e = *s; *s <<= val; break; }
             case R_Bit64: { STACK(u64, s, fdisp); prev.r = *s; *s <<= val; break; }
             default: break;
         }
-
-        rm->val = val;
-        rm->valtype = R_Bit8;
-        ASM_rmPrint("SHL", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
             case R_Bit16:
@@ -54,16 +54,16 @@ void ASM_C1SHR(RM *rm, s32 disp, u8 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
+        rm->val = val;
+        rm->valtype = R_Bit8;
+        ASM_rmPrint("SHR", rm, disp, v_Val, false);
+
         switch (rm->otype) {
             case R_Bit16: { STACK(u16, s, fdisp); prev.x = *s; *s >>= val; break; }
             case R_Bit32: { STACK(u32, s, fdisp); prev.e = *s; *s >>= val; break; }
             case R_Bit64: { STACK(u64, s, fdisp); prev.r = *s; *s >>= val; break; }
             default: break;
         }
-
-        rm->val = val;
-        rm->valtype = R_Bit8;
-        ASM_rmPrint("SHR", rm, disp, v_Val, false);
     } else {
         switch (rm->otype) {
             case R_Bit16:

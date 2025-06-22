@@ -190,7 +190,8 @@ typedef struct _data {
     u8 rm_code;
     u8 sib;
     u32 val;
-    s32 disp;
+    s32 sdisp;
+    u32 disp;
     RM rm;
     RegType regType;
     RegType valType;

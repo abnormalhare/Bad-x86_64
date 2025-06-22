@@ -10,12 +10,12 @@ void ASM_F6TEST(RM *rm, s32 disp, u8 val) {
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
 
-        STACK(u8, s, fdisp);
-        prev.l = *s;
-
         rm->val = val;
         rm->valtype = R_Bit8;
         ASM_rmPrint("TEST", rm, disp, v_Val, false);
+
+        STACK(u8, s, fdisp);
+        prev.l = *s;
     } else {
         switch (rm->otype) {
             case R_Bit8: prev.l = regs[rm->areg].l; break;
