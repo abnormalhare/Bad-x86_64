@@ -480,6 +480,16 @@ void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip) {
     } else {
         sprintf_s(buf, 256, "%s]", buf);
     }
+
+    switch (rm->ptrtype) {
+        default: break;
+        case R_Bit8:  { STACK(u8, n, ASM_getDisp(rm, disp)); sprintf_s(buf, 256, "%s = (0x%.2X)", buf, *n); } break;
+        case R_Bit16: { STACK(u16, n, ASM_getDisp(rm, disp)); sprintf_s(buf, 256, "%s = (0x%.4X)", buf, *n); } break;
+        case R_Bit32: { STACK(u32, n, ASM_getDisp(rm, disp)); sprintf_s(buf, 256, "%s = (0x%.8X)", buf, *n); } break;
+        case R_Bit64: { STACK(u64, n, ASM_getDisp(rm, disp)); sprintf_s(buf, 256, "%s = (0x%.16llX)", buf, *n); } break;
+        case R_Float128: { STACK(u128, n, ASM_getDisp(rm, disp)); sprintf_s(buf, 256, "%s = (0x%.16llX%.16llX)", buf, n->high, n->low); }
+    }
+
     printf_s(buf);
     ASM_sign = false;
 }

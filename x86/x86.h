@@ -86,15 +86,25 @@ bool _ASM_78(s8 val);
 bool _ASM_79(s8 val);
 bool _ASM_7C(s8 val);
 bool _ASM_7E(s8 val);
+// JB rel(8)
 #define ASM_72(val, t) if (_ASM_72(val)) goto JMP_##t
+// JNB rel(8)
 #define ASM_73(val, t) if (_ASM_73(val)) goto JMP_##t
+// JZ rel(8)
 #define ASM_74(val, t) if (_ASM_74(val)) goto JMP_##t
+// JNZ rel(8)
 #define ASM_75(val, t) if (_ASM_75(val)) goto JMP_##t
+// JBE rel(8)
 #define ASM_76(val, t) if (_ASM_76(val)) goto JMP_##t
+// JA rel(8)
 #define ASM_77(val, t) if (_ASM_77(val)) goto JMP_##t
+// JS rel(8)
 #define ASM_78(val, t) if (_ASM_78(val)) goto JMP_##t
+// JNS rel(8)
 #define ASM_79(val, t) if (_ASM_79(val)) goto JMP_##t
+// JL rel(8)
 #define ASM_7C(val, t) if (_ASM_7C(val)) goto JMP_##t
+// JLE rel(8)
 #define ASM_7E(val, t) if (_ASM_7E(val)) goto JMP_##t
 void ASM_80(u8 rm_code, u8 sib, s32 disp, u8 val);
 void ASM_81(u8 rm_code, u8 sib, s32 disp, u32 val);
@@ -113,14 +123,17 @@ void ASM_BL(u8 in, u8 val);
 void ASM_BH(u8 in, u64 val);
 void ASM_C1(u8 rm_code, u8 sib, s32 disp, u8 val);
 void _ASM_C3(void);
+// RET
 #define ASM_C3() _ASM_C3(); return
 void ASM_C6(u8 rm_code, u8 sib, s32 disp, u8 val);
 void ASM_C7(u8 rm_code, u8 sib, s32 disp, u32 val);
 void ASM_D1(u8 rm_code, u8 sib, s32 disp);
 void ASM_E8(u32 val);
 void ASM_E9(u32 val, bool call);
+// JMP rel(16/32) rel(8)
 #define ASM_E9_J(val, t) ASM_E9(val, false); goto JMP_##t
 void _ASM_EB(u8 val);
+// JMP rel(8)
 #define ASM_EB(val, t) _ASM_EB(val); goto JMP_##t
 void ASM_F0(void);
 void ASM_F2(void);

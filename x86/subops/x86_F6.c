@@ -29,6 +29,7 @@ void ASM_F6TEST(RM *rm, s32 disp, u8 val) {
 
     f.f.zf = (res.l == 0);
     f.f.sf = ((res.l & 0x80) == 0x80);
+    f.f.pf = ASM_getParity(res.l);
     f.f.of = 0;
     f.f.cf = 0;
 

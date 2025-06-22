@@ -1380,7 +1380,7 @@ void ASM_84(u8 rm_code, u8 sib, s32 disp) {
     RM rm; u32 fdisp = ASM_setupOp(&rm, rm_code, sib, disp, 2, R_Bit8);
 
     if (rm.isPtr) {
-        ASM_rmPrint("TEST", &rm, fdisp, v_Reg, false);
+        ASM_rmPrint("TEST", &rm, disp, v_Reg, false);
     } else {
         printf("TEST %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
     }
@@ -1396,7 +1396,7 @@ void ASM_85(u8 rm_code, u8 sib, s32 disp) {
     RM rm; u32 fdisp = ASM_setupOp(&rm, rm_code, sib, disp, 2, R_Bit32);
 
     if (rm.isPtr) {
-        ASM_rmPrint("TEST", &rm, fdisp, v_Reg, false);
+        ASM_rmPrint("TEST", &rm, disp, v_Reg, false);
     } else {
         printf("TEST %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
     }
@@ -1417,7 +1417,7 @@ void ASM_88(u8 rm_code, u8 sib, s32 disp) {
     RM rm; u32 fdisp = ASM_setupOp(&rm, rm_code, sib, disp, 2, R_Bit8);
 
     if (rm.isPtr) {
-        ASM_rmPrint("MOV", &rm, fdisp, v_Reg, false);
+        ASM_rmPrint("MOV", &rm, disp, v_Reg, false);
     } else {
         printf("MOV %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
     }
@@ -1433,7 +1433,7 @@ void ASM_89(u8 rm_code, u8 sib, s32 disp) {
     RM rm; u32 fdisp = ASM_setupOp(&rm, rm_code, sib, disp, 2, R_Bit32);
 
     if (rm.isPtr) {
-        ASM_rmPrint("MOV", &rm, fdisp, v_Reg, false);
+        ASM_rmPrint("MOV", &rm, disp, v_Reg, false);
     } else {
         printf("MOV %s, %s", ASM_getRegName(rm.areg, rm.atype), ASM_getRegName(rm.oreg, rm.otype));
     }
@@ -1454,7 +1454,7 @@ void ASM_8A(u8 rm_code, u8 sib, s32 disp) {
     RM rm; u32 fdisp = ASM_setupOp(&rm, rm_code, sib, disp, 2, R_Bit8);
 
     if (rm.isPtr) {
-        ASM_rmPrint("MOV", &rm, fdisp, v_Reg, true);
+        ASM_rmPrint("MOV", &rm, disp, v_Reg, true);
     } else {
         printf("MOV %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
     }
@@ -1470,7 +1470,7 @@ void ASM_8B(u8 rm_code, u8 sib, s32 disp) {
     RM rm; u32 fdisp = ASM_setupOp(&rm, rm_code, sib, disp, 2, R_Bit32);
 
     if (rm.isPtr) {
-        ASM_rmPrint("MOV", &rm, fdisp, v_Reg, true);
+        ASM_rmPrint("MOV", &rm, disp, v_Reg, true);
     } else {
         printf("MOV %s, %s", ASM_getRegName(rm.oreg, rm.otype), ASM_getRegName(rm.areg, rm.atype));
     }
@@ -1494,7 +1494,7 @@ void ASM_8D(u8 rm_code, u8 sib, s32 disp) {
     if (rm.isPtr) {
         u32 fdisp = ASM_getDisp(&rm, disp);
 
-        ASM_rmPrint("LEA", &rm, fdisp, v_Reg, true);
+        ASM_rmPrint("LEA", &rm, disp, v_Reg, true);
 
         switch (rm.otype) {
             case R_Bit16: { regs[rm.oreg].x = fdisp; break; }
