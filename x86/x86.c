@@ -1729,7 +1729,7 @@ void ASM_E8(u32 val) {
 }
 
 // JMP rel(16/32)
-void ASM_E9(u32 val, bool call) {
+void _ASM_E9(u32 val, bool call) {
     ASM_codeFunc func;
     Reg conv;
 
@@ -1749,6 +1749,10 @@ void ASM_E9(u32 val, bool call) {
         func = ASM_getCurrFunc();
         func();
     }
+}
+
+void ASM_E9(u32 val) {
+    _ASM_E9(val, true);
 }
 
 // 0xEA invalid

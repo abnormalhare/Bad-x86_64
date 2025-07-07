@@ -206,6 +206,7 @@ typedef void (*ASM_dataFunc)(Data *);
 
 // order: a, c, d, b, sp, bp, si, di, 8-15, ip
 extern Reg regs[17];
+
 // order: ss, cs, ds, es, fs, gs
 extern u16 sregs[6];
 extern XMMReg xregs[16];

@@ -430,10 +430,10 @@ void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip) {
     }
 
     if (rm->atype == R_Seg) {
-        sprintf_s(buf, 256, "%s%s:[rip", buf, ASM_getRegName(rm->areg, rm->atype));
+        sprintf_s(buf, 256, "%s%s:", buf, ASM_getRegName(rm->areg, rm->atype));
         
-        if      (rm->disp == 1) sprintf_s(buf, 256, "%s %c %#.2X]", buf, ASM_S(), sDisp);
-        else if (rm->disp == 4) sprintf_s(buf, 256, "%s %c %#.8X]", buf, ASM_S(), disp);
+        if      (rm->disp == 1) sprintf_s(buf, 256, "%s%c0x%.2X", buf, ASM_S(), sDisp);
+        else if (rm->disp == 4) sprintf_s(buf, 256, "%s%c0x%.8X", buf, ASM_S(), disp);
         
         printf_s(buf);
         return;
