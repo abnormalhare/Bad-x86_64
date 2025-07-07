@@ -318,6 +318,41 @@ void ASM_0F_31(Data *data) {
     ASM_end();
 }
 
+// CMOVB r(16-64), r/m(16-64)
+void ASM_0F_42(Data *data) {
+    u32 fdisp = ASM_setupOp(&data->rm, data->rm_code, data->sib, data->sdisp, 3, R_Bit32);
+    
+    if (data->rm.isPtr) {
+        ASM_rmPrint("CMOVB", &data->rm, data->disp, v_Reg, true);
+
+        if (!f.f.cf) {
+            switch (data->rm.otype) {
+                case R_Bit16: { STACK(u16, s, fdisp); regs[data->rm.oreg].x = *s; break; }
+                case R_Bit32: { STACK(u32, s, fdisp); regs[data->rm.oreg].e = *s; regs[data->rm.oreg].eh = 0; break; }
+                case R_Bit64: { STACK(u64, s, fdisp); regs[data->rm.oreg].r = *s; break; }
+                default: break;
+            }
+        } else if (data->rm.otype == R_Bit32) {
+            regs[data->rm.oreg].eh = 0;
+        }
+    } else {
+        if (!f.f.cf) {
+            switch (data->rm.otype) {
+                case R_Bit16: regs[data->rm.oreg].x = regs[data->rm.areg].x; break;
+                case R_Bit32: regs[data->rm.oreg].e = regs[data->rm.areg].e; regs[data->rm.oreg].eh = 0; break;
+                case R_Bit64: regs[data->rm.oreg].r = regs[data->rm.areg].r; break;
+                default: break;
+            }
+        } else if (data->rm.otype == R_Bit32) {
+            regs[data->rm.oreg].eh = 0;
+        }
+        printf("CMOVB %s, %s", ASM_getRegName(data->rm.oreg, data->rm.otype), ASM_getRegName(data->rm.areg, data->rm.atype));
+    }
+
+    ASM_rexPrint();
+    ASM_end();
+}
+
 // CMOVNB r(16-64), r/m(16-64)
 void ASM_0F_43(Data *data) {
     u32 fdisp = ASM_setupOp(&data->rm, data->rm_code, data->sib, data->sdisp, 3, R_Bit32);
@@ -1251,7 +1286,7 @@ ASM_dataFunc ASM_0FFuncs[0x100] = {
 /* 1X */ ASM_0F_10, ASM_0F_11, 0, 0, 0, 0, ASM_0F_16, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_1F, 
 /* 2X */ 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_28, ASM_0F_29, 0, 0, 0, 0, 0, 0, 
 /* 3X */ 0, ASM_0F_31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-/* 4X */ 0, 0, 0, ASM_0F_43, ASM_0F_44, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+/* 4X */ 0, 0, ASM_0F_42, ASM_0F_43, ASM_0F_44, ASM_0F_45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 5X */ 0, 0, 0, 0, 0, 0, 0, ASM_0F_57, 0, 0, 0, 0, 0, 0, 0, 0, 
 /* 6X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_6E, 0, 
 /* 7X */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ASM_0F_7E, ASM_0F_7F, 

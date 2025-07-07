@@ -82,29 +82,30 @@ void ASM_FFCALL(RM *rm, s32 disp) {
     
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
+        STACK(u64, fi, fdisp);
 
-        ASM_rmPrint("CALL cs:", rm, disp, v_None, false);
+        ASM_rmPrint("CALL cs:", rm, *fi, v_None, false);
         
         switch (rm->atype) {
-            case R_Bit16: { regs[16].x = fdisp; break; }
-            case R_Bit32: { regs[16].e = fdisp; break; }
-            case R_Bit64: { regs[16].r = fdisp; break; }
+            case R_Bit16: { regs[16].x = *fi; break; }
+            case R_Bit32: { regs[16].e = *fi; break; }
+            case R_Bit64: { regs[16].r = *fi; break; }
             default: break;
         }
         ASM_rexPrint();
     } else {
         switch (rm->atype) {
-            case R_Bit16: { regs[16].x = regs[rm->areg].x; break; }
-            case R_Bit32: { regs[16].e = regs[rm->areg].e; break; }
-            case R_Bit64: { regs[16].r = regs[rm->areg].r; break; }
+            case R_Bit16: { STACK(u16, fi, regs[rm->areg].x); regs[16].x = *fi; break; }
+            case R_Bit32: { STACK(u32, fi, regs[rm->areg].x); regs[16].e = *fi; break; }
+            case R_Bit64: { STACK(u64, fi, regs[rm->areg].x); regs[16].r = *fi; break; }
             default: break;
         }
 
         printf("CALL cs:%s", ASM_getRegName(rm->areg, rm->atype));
         ASM_rexPrint();
     }
-        
-    func = ASM_getFunc(regs[16].e);
+    
+    func = ASM_getCurrFunc();
 
     func(); // hopefully this wont cause a stack overflow
 }
@@ -117,23 +118,25 @@ void ASM_FFJMP(RM *rm, s32 disp) {
     
     if (rm->isPtr) {
         u32 fdisp = ASM_getDisp(rm, disp);
+        STACK(u64, fi, fdisp);
         
         if (rm->atype == R_Seg) rm->areg = s;
-        ASM_rmPrint("JMP cs:", rm, disp, v_None, false);
+
+        ASM_rmPrint("JMP cs:", rm, *fi, v_None, false);
         
         switch (rm->atype) {
-            case R_Bit16: { regs[16].x = fdisp; break; }
-            case R_Bit32: { regs[16].e = fdisp; break; }
-            case R_Bit64: { regs[16].r = fdisp; break; }
+            case R_Bit16: { regs[16].x = *fi; break; }
+            case R_Bit32: { regs[16].e = *fi; break; }
+            case R_Bit64: { regs[16].r = *fi; break; }
             default: break;
         }
 
         ASM_rexPrint();
     } else {
         switch (rm->atype) {
-            case R_Bit16: { regs[16].x = regs[rm->areg].x; break; }
-            case R_Bit32: { regs[16].e = regs[rm->areg].e; break; }
-            case R_Bit64: { regs[16].r = regs[rm->areg].r; break; }
+            case R_Bit16: { STACK(u16, fi, regs[rm->areg].x); regs[16].x = *fi; break; }
+            case R_Bit32: { STACK(u32, fi, regs[rm->areg].x); regs[16].e = *fi; break; }
+            case R_Bit64: { STACK(u64, fi, regs[rm->areg].x); regs[16].r = *fi; break; }
             default: break;
         }
 
@@ -141,7 +144,7 @@ void ASM_FFJMP(RM *rm, s32 disp) {
         ASM_rexPrint();
     }
 
-    func = ASM_getFunc(regs[16].e);
+    func = ASM_getCurrFunc();
 
     func(); // hopefully this wont cause a stack overflow
 }

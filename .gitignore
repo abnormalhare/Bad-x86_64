@@ -2,7 +2,7 @@
 .vs
 .vscode
 
-boot/
+test/
 
 build/
 build.bat

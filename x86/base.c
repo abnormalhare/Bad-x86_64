@@ -138,10 +138,6 @@ ASM_codeFunc ASM_getFunc(u64 ip) {
     ASM_codeFunc func = NULL;
     
     func = (ASM_codeFunc)*temp;
-    if ((u64)func < 0x100000) {
-        STACK(u64, temp2, *temp);
-        func = (ASM_codeFunc)*temp2;
-    }
 
     if (func == NULL) {
         printf("Function not found: %.8llX\n", ip);
@@ -373,6 +369,10 @@ const char *ASM_ptrName(RegType bits) {
         case R_Float128: return "XMMWORD PTR";
         default: return "UNIMPL PTR";
     }
+}
+
+void ASM_error(void) {
+    printf("---- error@ %.8X ----\n", regs[16].e);
 }
 
 void ASM_rexPrint(void) {

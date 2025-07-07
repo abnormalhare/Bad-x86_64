@@ -249,12 +249,12 @@ void ASM_0D(u32 imm) {
 // 0x0E invalid
 
 #include "subops/x86_0F.c"
-void ASM_0F(u8 index, Data *data) {
+void ASM_0F(u8 index, Data data) {
     if (ASM_0FFuncs[index] == 0) {
         printf("UNIMPLEMENTED OPCODE: 0F %X", index);
         exit(EXIT_FAILURE);
     }
-    ASM_0FFuncs[index](data);
+    ASM_0FFuncs[index](&data);
 
     ASM_end();
 }
@@ -1535,6 +1535,7 @@ void ASM_A8(u8 val) {
     ASM_end();
 }
 
+// (REP) STOSB
 void ASM_AA(void) {
     u64 cnt = regs[1].r;
     u64 *st = &regs[7].r;
@@ -1723,7 +1724,7 @@ void ASM_E8(u32 val) {
     }
     ASM_rexPrint();
 
-    func = ASM_getFunc(regs[16].e);
+    func = ASM_getCurrFunc();
     func();
 }
 
@@ -1745,7 +1746,7 @@ void ASM_E9(u32 val, bool call) {
     ASM_rexPrint();
 
     if (call) {
-        func = ASM_getFunc(regs[16].e);
+        func = ASM_getCurrFunc();
         func();
     }
 }

@@ -268,6 +268,7 @@ void ASM_incIP(u32 num, RM *rm);
 void ASM_setFlags(Reg *prev, Reg *res, RegType type, bool borrow);
 char *ASM_getRegName(u8 index, RegType type);
 const char* ASM_ptrName(RegType bits);
+void ASM_error(void);
 void ASM_rmPrint(const char *name, RM *rm, s32 disp, opVal val, bool flip);
 void ASM_rexPrint(void);
 void ASM_regPrint(void);
