@@ -6,3 +6,5 @@ test/
 
 build/
 build.bat
+
+out.txt
