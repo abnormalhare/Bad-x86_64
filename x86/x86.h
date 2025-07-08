@@ -17,14 +17,14 @@ void ASM_0B(u8 rm_code, u8 sib, s32 disp);
 void ASM_0C(u8 imm);
 void ASM_0D(u32 imm);
 void ASM_0F(u8 index, Data data);
-bool _ASM_0F_82(Data *data);
-bool _ASM_0F_83(Data *data);
-bool _ASM_0F_84(Data *data);
-bool _ASM_0F_85(Data *data);
-bool _ASM_0F_87(Data *data);
-bool _ASM_0F_88(Data *data);
-bool _ASM_0F_89(Data *data);
-bool _ASM_0F_8E(Data *data);
+bool _ASM_0F_82(Data data);
+bool _ASM_0F_83(Data data);
+bool _ASM_0F_84(Data data);
+bool _ASM_0F_85(Data data);
+bool _ASM_0F_87(Data data);
+bool _ASM_0F_88(Data data);
+bool _ASM_0F_89(Data data);
+bool _ASM_0F_8E(Data data);
 #define ASM_0F_J(ix, data, t) if (_ASM_0F_## ix (data)) goto JMP_##t; ASM_end()
 #define ASM_0F_R(ix, data) if (_ASM_0F_## ix (data)) return; ASM_end()
 

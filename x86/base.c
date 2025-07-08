@@ -373,6 +373,7 @@ const char *ASM_ptrName(RegType bits) {
 
 void ASM_error(void) {
     printf("---- error@ %.8X ----\n", regs[16].e);
+    exit(EXIT_FAILURE);
 }
 
 void ASM_rexPrint(void) {

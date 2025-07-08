@@ -254,7 +254,7 @@ void ASM_0F(u8 index, Data data) {
         printf("UNIMPLEMENTED OPCODE: 0F %X", index);
         exit(EXIT_FAILURE);
     }
-    ASM_0FFuncs[index](&data);
+    ASM_0FFuncs[index](data);
 
     ASM_end();
 }

@@ -202,7 +202,7 @@ typedef void (*ASM_codeFunc)(void);
 typedef void (*ASM_baseFunc)(RM *, s32);
 typedef void (*ASM_valFunc)(RM *, s32, u8);
 typedef void (*ASM_val32Func)(RM *, s32, u32);
-typedef void (*ASM_dataFunc)(Data *);
+typedef void (*ASM_dataFunc)(Data);
 
 // order: a, c, d, b, sp, bp, si, di, 8-15, ip
 extern Reg regs[17];
